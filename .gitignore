@@ -1,0 +1,79 @@
+# Ghidra no se versiona: obtener con scripts/install_decompilador.sh (descarga + unzip local).
+ghidra_*_PUBLIC/
+ghidra*.zip
+
+# Proyectos / carpetas de Ghidra (GUI o headless)
+ghidra_headless_projects/
+*.gpr
+*.rep/
+
+# --- Salida del descompilador y pruebas ---
+decompiled_*/
+
+# --- Logs y temporales ---
+*.log
+headless_*.log
+tmp/
+temp/
+*.tmp
+*.cache
+
+# --- Volcados y depuración ---
+core
+core.*
+vgcore.*
+*.stackdump
+hs_err_pid*.log
+
+# --- Binarios de muestra: solo versionamos ls.bin ---
+*.bin
+!ls.bin
+*.exe
+*.dll
+*.dylib
+*.ko
+*.obj
+
+# --- Compilación (C/C++, etc.) ---
+*.o
+*.a
+*.out
+CMakeFiles/
+cmake-build-*/
+build/
+dist/
+
+# --- Python ---
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Java (scripts Ghidra compilados a mano, etc.) ---
+*.class
+target/
+
+# --- Editores / IDE ---
+.idea/
+.vscode/
+*.code-workspace
+.cursor/
+
+# --- Copias y respaldos ---
+*~
+*.swp
+*.swo
+*.bak
+*.orig
+*.rej
+
+# --- Sistema operativo ---
+.DS_Store
+Thumbs.db
+Desktop.ini
+.directory
+ghidra_scripts/ExportAllDecompiled.java
+humanized/main.c
