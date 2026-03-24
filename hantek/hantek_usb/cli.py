@@ -393,8 +393,10 @@ def _finalize_capture_payload(ns: argparse.Namespace, chunks: List[bytes]) -> No
         print(f"dump_bin: {len(payload)} bytes -> {ns.dump_bin}", file=sys.stderr)
     if getattr(ns, "export_csv", None):
         dt = float(getattr(ns, "csv_dt", 1.0))
-        n = export_scope_csv(ns.export_csv, payload, dt_seconds=dt)
-        print(f"export_csv: {n} muestras -> {ns.export_csv}", file=sys.stderr)
+        interleaved = not getattr(ns, "no_interleaved", False)
+        n = export_scope_csv(ns.export_csv, payload, dt_seconds=dt, interleaved=interleaved)
+        mode = "CH1+CH2" if interleaved else "stream"
+        print(f"export_csv: {n} filas ({mode}) -> {ns.export_csv}", file=sys.stderr)
 
 
 def _cmd_get_source_data(ns: argparse.Namespace) -> None:
@@ -404,10 +406,11 @@ def _cmd_get_source_data(ns: argparse.Namespace) -> None:
         from hantek_usb.osc_decode import format_analyze_report, format_capture_summary, trim_to_expected, flatten_chunks
 
         expected = (int(ns.count_a) & 0xFFFF) + (int(ns.count_b) & 0xFFFF)
-        print(format_capture_summary(chunks, expected_bytes=expected))
+        il = not getattr(ns, "no_interleaved", False)
+        print(format_capture_summary(chunks, expected_bytes=expected, interleaved=il))
         if getattr(ns, "analyze", False):
             payload = trim_to_expected(flatten_chunks(chunks), expected)
-            print(format_analyze_report(payload))
+            print(format_analyze_report(payload, interleaved=il))
     elif not (
         getattr(ns, "dump_bin", None)
         or getattr(ns, "export_csv", None)
@@ -424,10 +427,11 @@ def _cmd_get_real_data(ns: argparse.Namespace) -> None:
         from hantek_usb.osc_decode import format_analyze_report, format_capture_summary, trim_to_expected, flatten_chunks
 
         expected = (int(ns.count_a) & 0xFFFF) + (int(ns.count_b) & 0xFFFF)
-        print(format_capture_summary(chunks, expected_bytes=expected))
+        il = not getattr(ns, "no_interleaved", False)
+        print(format_capture_summary(chunks, expected_bytes=expected, interleaved=il))
         if getattr(ns, "analyze", False):
             payload = trim_to_expected(flatten_chunks(chunks), expected)
-            print(format_analyze_report(payload))
+            print(format_analyze_report(payload, interleaved=il))
     elif not (
         getattr(ns, "dump_bin", None)
         or getattr(ns, "export_csv", None)
@@ -1098,7 +1102,7 @@ def _attach_get_source_data_args(
         "--export-csv",
         default=None,
         metavar="FILE",
-        help="Guardar muestras ADC (u8) en CSV: index,time_s,adc_u8 — LibreOffice, Excel, gnuplot",
+        help="CSV: por defecto dos canales index,time_s,ch1_u8,ch2_u8; con --no-interleaved una columna adc",
     )
     p.add_argument(
         "--csv-dt",
@@ -1106,6 +1110,11 @@ def _attach_get_source_data_args(
         default=1.0,
         metavar="S",
         help="Segundos entre muestras (time_s = index * S); solo escala el eje tiempo (default 1)",
+    )
+    p.add_argument(
+        "--no-interleaved",
+        action="store_true",
+        help="Captura: un solo canal en CSV/analyze/parse (sin separar pares/impares CH1/CH2)",
     )
     if with_clear_buffer:
         p.add_argument(

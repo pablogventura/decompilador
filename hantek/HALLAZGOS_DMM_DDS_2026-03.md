@@ -206,6 +206,12 @@ Recomendación operativa:
 - Preferí `dds-offset` **sin** `--write-only` si querés el camino “DLL-like” (escritura + lectura IN).
 - Si necesitás offset visible en pantalla y el USB no lo refleja, contrastar con la app oficial o captura USB completa (Wireshark) mientras movés offset desde el panel.
 
+## Osciloscopio: buffer entrelazado (validado)
+
+En captura `0x16` con **dos canales activos**, el stream de bytes USB encaja con **CH1, CH2, CH1, CH2…** (un byte ADC por canal e instante). Tratar el buffer como una sola secuencia `u8` mezcla ambos canales.
+
+En este repo, `hantek_usb.osc_decode.split_interleaved_u8` y el **CSV por defecto** (`index,time_s,ch1_u8,ch2_u8`) asumen ese layout. Para un flujo crudo sin separar canales (depuración), usar **`--no-interleaved`** en `get-source-data` / `get-real-data`. Detalle en `PROTOCOLO_USB.md` §3.3.
+
 ## Notas de validez
 
 - El valor de `[11]` aparece en múltiples modos y no siempre identifica directamente la magnitud física.

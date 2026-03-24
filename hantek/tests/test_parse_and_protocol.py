@@ -18,7 +18,7 @@ from hantek_usb.protocol import (
     source_data_request_packet,
     zero_cali_short_packet,
 )
-from hantek_usb.osc_decode import decode_capture, export_scope_csv
+from hantek_usb.osc_decode import decode_capture, export_scope_csv, split_interleaved_u8
 
 
 def test_scope_query_3_1_len() -> None:
@@ -53,9 +53,28 @@ def test_source_data_request_packet_layout() -> None:
     assert p[7] == 0x20 and p[8] == 0x00
 
 
-def test_export_scope_csv(tmp_path: Path) -> None:
+def test_split_interleaved_u8() -> None:
+    a, b = split_interleaved_u8(bytes([10, 20, 30, 40]))
+    assert a == [10, 30]
+    assert b == [20, 40]
+    a2, b2 = split_interleaved_u8(bytes([1, 2, 3]))
+    assert a2 == [1, 3]
+    assert b2 == [2]
+
+
+def test_export_scope_csv_interleaved(tmp_path: Path) -> None:
     p = tmp_path / "w.csv"
-    n = export_scope_csv(p, bytes([10, 20, 30]), dt_seconds=0.5)
+    n = export_scope_csv(p, bytes([10, 20, 30]), dt_seconds=0.5, interleaved=True)
+    assert n == 2
+    t = p.read_text(encoding="utf-8")
+    assert "ch1_u8,ch2_u8" in t
+    assert "0,0,10,20" in t
+    assert "1,0.5,30," in t
+
+
+def test_export_scope_csv_raw_stream(tmp_path: Path) -> None:
+    p = tmp_path / "w.csv"
+    n = export_scope_csv(p, bytes([10, 20, 30]), dt_seconds=0.5, interleaved=False)
     assert n == 3
     t = p.read_text(encoding="utf-8")
     assert "index,time_s,adc_u8" in t

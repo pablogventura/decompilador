@@ -114,9 +114,9 @@ def main() -> int:
         )
         expected = (ns.count_a & 0xFFFF) + (ns.count_b & 0xFFFF)
         raw = trim_to_expected(flatten_chunks(chunks), expected)
-        print(format_capture_summary(chunks, expected_bytes=expected))
+        print(format_capture_summary(chunks, expected_bytes=expected, interleaved=True))
         if ns.analyze:
-            print(format_analyze_report(raw))
+            print(format_analyze_report(raw, interleaved=True))
     finally:
         link.close()
     return 0

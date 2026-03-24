@@ -20,10 +20,13 @@ En Linux hacen falta permisos udev (o root) para `0483:2d42` (por defecto) u otr
 .venv/bin/python -m hantek_usb factory-pulse --wait-read --parse
 .venv/bin/python -m hantek_usb get-real-data --parse --count-a 0x400 --count-b 0
 .venv/bin/python -m hantek_usb get-real-data --dump-bin captura.bin --count-a 0x400 --count-b 0
-# CSV para gráfico (LibreOffice, Excel, gnuplot): columnas index, time_s, adc_u8 (ADC crudo, sin V)
+# CSV (por defecto dos canales): index,time_s,ch1_u8,ch2_u8 — ver PROTOCOLO_USB.md §3.3
 .venv/bin/python -m hantek_usb get-real-data --parse --export-csv captura.csv --count-a 0x400 --count-b 0
-# gnuplot:  plot 'captura.csv' using 2:3 with lines
+# Un solo flujo u8 (sin separar CH1/CH2): añadí --no-interleaved
+# gnuplot dos trazos:  plot 'captura.csv' using 2:3 title 'CH1', '' using 2:4 title 'CH2'
 .venv/bin/python -m hantek_usb decode-hex "55 05 00 0c 01"
+# Vista en vivo (Tkinter + matplotlib), CH1/CH2 por defecto
+.venv/bin/python tools/scope_live_view.py
 ```
 
 Opcional: `--csv-dt 1e-6` fija el paso de tiempo entre muestras en segundos (`time_s = index * csv-dt`) si conocés el muestreo; si no, el eje X es índice×1 s (solo referencia).
@@ -82,7 +85,31 @@ Para equipos lentos, usa:
 .venv/bin/python tools/dds_osc_coherence.py --waves 0,1,2,3 --reps 1 --slow-profile --exercise-scope-options
 ```
 
-`--exercise-scope-options` prueba autoset y varios comandos de modo osciloscopio (trigger/canal/time-div) con pausas entre comandos.
+`--exercise-scope-options` prueba autoset y varios comandos de modo osciloscopio (trigger/canal/time-div) con pausas entre comandos. Para la misma secuencia sin autoajuste (`dsoHTScopeAutoSet` / 0x13), usá `--no-autoset`.
+
+## Barrido de opciones de osciloscopio (DDS fijo)
+
+Con el DDS en una señal conocida (p. ej. seno 50 Hz), **`tools/scope_options_probe.py`** aplica **un opcode distinto por paso** (base de tiempos, V/div CH1, modo de barrido del disparo, etc.), captura `0x16` y muestra **pp**, **cruces respecto de la media** (`xings`, proxy de “cuánto oscila” la ventana) y clipping en el canal elegido. Sirve para correlacionar **valor USB** con **forma de la captura**; los números son **índices firmware**, no V/div ni s/div en unidades SI.
+
+```bash
+.venv/bin/python tools/scope_options_probe.py --explain
+.venv/bin/python tools/scope_options_probe.py --sweep time-div --values 4,8,12,16
+.venv/bin/python tools/scope_options_probe.py --sweep ch1-volt --values 4,7,11
+```
+
+Lógica compartida con la prueba de coherencia: `hantek_usb/dds_scope_helpers.py`.
+
+## Autoset por software (sin 0x13)
+
+**`tools/scope_autoset_soft.py`** itera **V/div** (índice firmware) según pp y clipping en CH1/CH2, sin llamar a `SCOPE_AUTOSET`. Opcionalmente ajusta **TIME_DIV** si los cruces por la media salen del rango. Con DDS interno:
+
+```bash
+.venv/bin/python tools/scope_autoset_soft.py --wave 2 --freq 50 --amp 1200
+```
+
+Solo señal externa (`--no-dds`): ajustá `--volt-min` / `--volt-max` y el canal (`--metrics-ch`).
+
+La **primera captura** no toca V/div (mismo camino que `dds_osc_coherence`); si la señal es casi plana (`pp<8`), el script sale con un aviso. Si el índice V/div en tu equipo reacciona al revés al esperado para “subir ganancia”, probá `--invert-volt-heuristic`.
 
 ## Barrido anti-clipping (V/div, sonda, amplitud DDS)
 

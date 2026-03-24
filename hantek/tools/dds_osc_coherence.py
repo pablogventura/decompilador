@@ -7,6 +7,13 @@ Hace, por cada forma de onda:
 2) Cambia a modo osciloscopio
 3) Captura muestras crudas por USB
 4) Resume métricas y marca si hubo saturación ADC
+
+Por defecto el buffer USB es **entrelazado** (CH1, CH2, …). Las métricas (pp, clipping,
+``frac_mid``) se calculan sobre **un solo canal** (CH1 por defecto, ver ``--metrics-ch``),
+no sobre el buffer mezclado.
+
+Para barrer **time/div, V/div, disparo** con señal DDS fija y ver el efecto en la captura,
+usá ``tools/scope_options_probe.py`` (ver README en hantek/).
 """
 
 from __future__ import annotations
@@ -16,60 +23,27 @@ import os
 import statistics
 import sys
 import time
-from dataclasses import dataclass
 from typing import Iterable, List
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from hantek_usb.capture import smart_source_data_capture
-from hantek_usb.constants import DDS_WAVE_TYPE_LABELS, WORK_TYPE_OSCILLOSCOPE, WORK_TYPE_SIGNAL_GENERATOR
-from hantek_usb.osc_decode import flatten_chunks, trim_to_expected
+from hantek_usb.constants import WORK_TYPE_OSCILLOSCOPE, WORK_TYPE_SIGNAL_GENERATOR
+from hantek_usb.dds_scope_helpers import (
+    ScopeChannelMetrics,
+    capture_scope_raw,
+    configure_dds,
+    compute_scope_channel_metrics,
+    tx_wait_ack,
+)
 from hantek_usb.protocol import (
     Opcodes04440,
-    OpcodesDDS,
     ch_opcode,
-    dds_onoff_packet,
-    dds_packet,
-    dds_u16_packet,
     fun_04440,
     read_all_settings,
     scope_run_stop_stm32,
     work_type_packet,
 )
 from hantek_usb.transport import HantekLink
-
-
-@dataclass
-class CaptureMetrics:
-    wave: int
-    wave_name: str
-    rep: int
-    bytes_used: int
-    u8_min: int
-    u8_max: int
-    pp: float
-    mean: float
-    spikiness: float
-    frac_mid: float
-    clipped: bool
-
-
-def _emit_noop(_s: str) -> None:
-    return
-
-
-def _tx_wait_ack(link: HantekLink, pkt: bytes, *, retries: int = 2, sleep_s: float = 0.25) -> bytes:
-    last: Exception | None = None
-    for attempt in range(retries + 1):
-        try:
-            link.write(pkt)
-            return link.read64()
-        except Exception as e:  # hardware/USB, no dependency in traceback details
-            last = e
-            if attempt < retries and sleep_s > 0:
-                time.sleep(sleep_s)
-    assert last is not None
-    raise last
 
 
 def _parse_waves(raw: str) -> List[int]:
@@ -84,95 +58,29 @@ def _parse_waves(raw: str) -> List[int]:
     return out
 
 
-def _compute_metrics(raw: bytes, wave: int, rep: int, clip_hi: int, clip_lo: int) -> CaptureMetrics:
-    u = list(raw)
-    if not u:
-        raise RuntimeError("Captura vacía.")
-    mean = statistics.mean(u)
-    xc = [x - mean for x in u]
-    pp = float(max(xc) - min(xc))
-    pp = max(pp, 1e-9)
-    diffs = [xc[i + 1] - xc[i] for i in range(len(xc) - 1)]
-    absd = [abs(d) for d in diffs] if diffs else [0.0]
-    mad = statistics.mean(absd)
-    maxd = max(absd)
-    spikiness = maxd / (mad + 1e-9)
-
-    lo = min(u)
-    hi = max(u)
-    span = hi - lo
-    mid_lo = lo + 0.15 * span
-    mid_hi = hi - 0.15 * span
-    frac_mid = sum(1 for x in u if mid_lo <= x <= mid_hi) / len(u)
-
-    clipped = lo <= clip_lo or hi >= clip_hi
-
-    return CaptureMetrics(
-        wave=wave,
-        wave_name=DDS_WAVE_TYPE_LABELS.get(wave, f"wave{wave}"),
-        rep=rep,
-        bytes_used=len(raw),
-        u8_min=lo,
-        u8_max=hi,
-        pp=pp,
-        mean=mean,
-        spikiness=spikiness,
-        frac_mid=frac_mid,
-        clipped=clipped,
-    )
-
-
-def _configure_dds(link: HantekLink, wave: int, freq: int, amp: int, settle_s: float) -> None:
-    link.write(work_type_packet(WORK_TYPE_SIGNAL_GENERATOR, read=False))
-    link.write(dds_u16_packet(OpcodesDDS.WAVE_TYPE, wave & 0xFFFF, read=False))
-    link.write(dds_packet(OpcodesDDS.FREQUENCY, wait=False, u32_value=freq))
-    link.write(dds_packet(OpcodesDDS.AMP, wait=False, u32_value=amp))
-    link.write(dds_onoff_packet(True, read=False))
-    if settle_s > 0:
-        time.sleep(settle_s)
-
-
-def _capture_scope(link: HantekLink, count_a: int, count_b: int, settle_s: float) -> bytes:
-    link.write(work_type_packet(WORK_TYPE_OSCILLOSCOPE, read=False))
-    _ = _tx_wait_ack(link, read_all_settings(), retries=3, sleep_s=0.25)
-    link.write(scope_run_stop_stm32(True))
-    time.sleep(0.12)
-    if settle_s > 0:
-        time.sleep(settle_s)
-
-    chunks = smart_source_data_capture(
-        link,
-        count_a,
-        count_b,
-        blocks_fixed=64,
-        smart=True,
-        retry_max=30,
-        sleep_ms=15,
-        max_total_blocks=256,
-        verbose=False,
-        emit=_emit_noop,
-        hex_fmt=lambda b: b.hex(),
-    )
-    expected = (count_a & 0xFFFF) + (count_b & 0xFFFF)
-    return trim_to_expected(flatten_chunks(chunks), expected)
-
-
-def _exercise_scope_options(link: HantekLink, cmd_sleep_s: float) -> None:
+def _exercise_scope_options(
+    link: HantekLink,
+    cmd_sleep_s: float,
+    *,
+    skip_autoset: bool = False,
+) -> None:
     """
     Envia una secuencia amplia de comandos de modo osciloscopio con pausas.
     Valores conservadores para minimizar riesgo de dejar el equipo en estado raro.
+
+    Por defecto arranca con ``SCOPE_AUTOSET`` (0x13). Con ``skip_autoset=True`` se omite
+    para probar sin re-autoajuste vertical/temporal del equipo.
     """
-    # Auto fitting (autoset) no espera respuesta.
-    link.write(fun_04440(Opcodes04440.SCOPE_AUTOSET, 0, 1, False))
-    if cmd_sleep_s > 0:
-        time.sleep(cmd_sleep_s)
+    if not skip_autoset:
+        link.write(fun_04440(Opcodes04440.SCOPE_AUTOSET, 0, 1, False))
+        if cmd_sleep_s > 0:
+            time.sleep(cmd_sleep_s)
 
     link.write(scope_run_stop_stm32(True))
     time.sleep(0.12)
     if cmd_sleep_s > 0:
         time.sleep(cmd_sleep_s)
 
-    # Comandos con respuesta (wait=True).
     ops: list[tuple[int, int, int]] = [
         (Opcodes04440.TIME_DIV, 8, 2),
         (Opcodes04440.YT_FORMAT, 0, 2),
@@ -181,7 +89,6 @@ def _exercise_scope_options(link: HantekLink, cmd_sleep_s: float) -> None:
         (Opcodes04440.TRIGGER_SWEEP, 0, 2),
         (Opcodes04440.TRIGGER_HPOS, 0x80, 3),
         (Opcodes04440.TRIGGER_VPOS, 0x40, 1),
-        # CH1 (channel=0): onoff, couple, probe, bw, volt, pos.
         (ch_opcode(0, 0), 1, 1),
         (ch_opcode(0, 1), 0, 1),
         (ch_opcode(0, 2), 0, 1),
@@ -191,14 +98,13 @@ def _exercise_scope_options(link: HantekLink, cmd_sleep_s: float) -> None:
     ]
     for opcode, value, payload_bytes in ops:
         try:
-            _ = _tx_wait_ack(
+            _ = tx_wait_ack(
                 link,
                 fun_04440(opcode, value, payload_bytes, True),
                 retries=2,
                 sleep_s=max(0.2, cmd_sleep_s / 2),
             )
         except Exception as e:
-            # Algunos comandos pueden no responder igual según estado/UI del equipo.
             print(f"[warn] scope opcode 0x{opcode:02x} sin ack: {e}", file=sys.stderr)
         if cmd_sleep_s > 0:
             time.sleep(cmd_sleep_s)
@@ -224,35 +130,58 @@ def _run_once(
     exercise_scope: bool,
     scope_cmd_sleep_s: float,
     timeout_ms: int,
-) -> CaptureMetrics:
+    interleaved: bool,
+    metrics_channel: int,
+    skip_autoset: bool,
+) -> ScopeChannelMetrics:
     link = HantekLink(timeout_ms=timeout_ms)
     try:
-        _configure_dds(link, wave=wave, freq=freq, amp=amp, settle_s=dds_settle_s)
+        configure_dds(link, wave=wave, freq=freq, amp=amp, settle_s=dds_settle_s)
         if exercise_scope:
             link.write(work_type_packet(WORK_TYPE_OSCILLOSCOPE, read=False))
             if scope_cmd_sleep_s > 0:
                 time.sleep(scope_cmd_sleep_s)
-            _exercise_scope_options(link, cmd_sleep_s=scope_cmd_sleep_s)
-        raw = _capture_scope(link, count_a=count_a, count_b=count_b, settle_s=scope_settle_s)
-        return _compute_metrics(raw, wave=wave, rep=rep, clip_hi=clip_hi, clip_lo=clip_lo)
+            _exercise_scope_options(
+                link,
+                cmd_sleep_s=scope_cmd_sleep_s,
+                skip_autoset=skip_autoset,
+            )
+        raw = capture_scope_raw(link, count_a=count_a, count_b=count_b, settle_s=scope_settle_s)
+        return compute_scope_channel_metrics(
+            raw,
+            wave=wave,
+            rep=rep,
+            clip_hi=clip_hi,
+            clip_lo=clip_lo,
+            interleaved=interleaved,
+            metrics_channel=metrics_channel,
+        )
     finally:
         link.close()
 
 
-def _print_table(rows: Iterable[CaptureMetrics]) -> None:
-    print("wave         rep  bytes  min  max   pp     mean   spiky  frac_mid  status")
-    print("--------------------------------------------------------------------------")
+def _print_table(rows: Iterable[ScopeChannelMetrics]) -> None:
+    print(
+        "wave         rep  bytes  ch_min max   pp     mean   spiky  frac_mid  xings  "
+        "ch_other(min..max)  status"
+    )
+    print("-----------------------------------------------------------------------------------------")
     for r in rows:
         status = "CLIPPED" if r.clipped else "OK"
+        if r.interleaved and r.other_ch_min is not None:
+            oth = f"{r.other_ch_min:>3d}..{r.other_ch_max:>3d}"
+        else:
+            oth = "—"
         print(
             f"{r.wave_name:11s} {r.rep:>3d}  {r.bytes_used:>5d}  {r.u8_min:>3d}  {r.u8_max:>3d}  "
-            f"{r.pp:>6.1f}  {r.mean:>6.1f}  {r.spikiness:>6.2f}  {r.frac_mid:>8.3f}  {status}"
+            f"{r.pp:>6.1f}  {r.mean:>6.1f}  {r.spikiness:>6.2f}  {r.frac_mid:>8.3f}  "
+            f"{r.mean_crossings:>5d}  {oth:>18s}  {status}"
         )
 
 
-def _print_summary(rows: List[CaptureMetrics]) -> int:
+def _print_summary(rows: List[ScopeChannelMetrics]) -> int:
     print("")
-    by_wave: dict[int, List[CaptureMetrics]] = {}
+    by_wave: dict[int, List[ScopeChannelMetrics]] = {}
     for r in rows:
         by_wave.setdefault(r.wave, []).append(r)
 
@@ -294,6 +223,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Ejecuta secuencia de comandos de modo osciloscopio (autoset, trigger, canal, time/div).",
     )
     p.add_argument(
+        "--no-autoset",
+        action="store_true",
+        help="Con --exercise-scope-options: no enviar SCOPE_AUTOSET (0x13); el resto de la secuencia igual.",
+    )
+    p.add_argument(
         "--scope-cmd-sleep-ms",
         type=float,
         default=250.0,
@@ -309,6 +243,18 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--clip-hi", type=int, default=250, help="Umbral alto de clipping")
     p.add_argument("--clip-lo", type=int, default=5, help="Umbral bajo de clipping")
     p.add_argument("--timeout-ms", type=int, default=5000, help="Timeout USB por transferencia")
+    p.add_argument(
+        "--no-interleaved",
+        action="store_true",
+        help="Métricas sobre el buffer completo (un solo u8 por muestra); depuración.",
+    )
+    p.add_argument(
+        "--metrics-ch",
+        type=int,
+        choices=(1, 2),
+        default=1,
+        help="Canal para pp/clipping (solo con buffer entrelazado; DDS suele ir a CH1).",
+    )
     return p
 
 
@@ -324,7 +270,7 @@ def main(argv: List[str] | None = None) -> int:
         ns.scope_settle_ms = max(ns.scope_settle_ms, 450.0)
         ns.scope_cmd_sleep_ms = max(ns.scope_cmd_sleep_ms, 450.0)
 
-    rows: List[CaptureMetrics] = []
+    rows: List[ScopeChannelMetrics] = []
     try:
         for wave in waves:
             for rep in range(1, ns.reps + 1):
@@ -342,6 +288,9 @@ def main(argv: List[str] | None = None) -> int:
                     exercise_scope=bool(ns.exercise_scope_options),
                     scope_cmd_sleep_s=max(0.0, ns.scope_cmd_sleep_ms / 1000.0),
                     timeout_ms=ns.timeout_ms,
+                    interleaved=not ns.no_interleaved,
+                    metrics_channel=ns.metrics_ch,
+                    skip_autoset=bool(ns.no_autoset),
                 )
                 rows.append(row)
                 print(

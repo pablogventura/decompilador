@@ -81,6 +81,12 @@ Los **`dsoHTSet*`** (p. ej. `dsoHTSetRunStop`) pasan por **`FUN_10004440`**, que
 
 Cada una acaba construyendo buffers y llamando a **`FUN_10002060`** / **`FUN_10002020`**. Para documentar **todas** las órdenes, conviene **seguir cada `dsoHTSet*` / `dsoHTGet*`** en `decompiled_hantek/HTHardDll.dll/` y anotar el **payload de 5–10 bytes** (y la longitud de lectura).
 
+### 3.3 Captura `0x16` y dos canales (entrelazado)
+
+En el firmware (`FUN_08032140`), la respuesta de **adquisición** entrega bytes **consecutivos** desde la RAM de muestras. En **2xx2** con **dos canales activos**, el contenido encaja con **CH1, CH2, CH1, CH2…** (un byte ADC por canal e instante). Dibujar ese buffer como una sola curva **u8** mezcla ambos canales y deforma métricas.
+
+En este repo, **`hantek_usb.osc_decode.split_interleaved_u8`** separa pares (CH1) e impares (CH2); es el **comportamiento por defecto** en `--export-csv`, `--parse` / `--analyze`, y en **`tools/scope_live_view.py`**. Para tratar el payload como **un solo canal** (depuración), usá **`--no-interleaved`** en `get-source-data` / `get-real-data`.
+
 ---
 
 ## 4. Enfoque recomendado para Python (CLI)
@@ -111,6 +117,12 @@ Cada una acaba construyendo buffers y llamando a **`FUN_10002060`** / **`FUN_100
 ### 4.3 Referencias externas
 
 Busca proyectos abiertos tipo **OpenHantek** / drivers para modelos 6022/6xxx: muchos Hantek comparten ideas (aunque el **mapa de comandos puede cambiar** por familia). Tu descompilado de **esta** DLL sigue siendo la fuente más fiable para el **2D42 / 2xx2** concreto.
+
+### 4.4 Correlación empírica (opciones de visualización)
+
+Los opcodes `0x0D`–`0x14` (`Opcodes04440`: YT, TIME_DIV, disparo, etc.) se envían como `fun_04440` con **valor entero** y **ancho de payload** (1–4 bytes). La correspondencia con **segundos/div** o **V/div** en pantalla no está tabulada en este repo: depende del firmware y del estado del equipo.
+
+Para **medir el efecto** de cada ajuste sobre la captura cruda `0x16`, podés usar **`tools/scope_options_probe.py`**: fija DDS (señal conocida), barre un parámetro (`--sweep time-div`, `ch1-volt`, …) y compara **pp** y **cruces por la media** en CH1/CH2. Ver `hantek/README.md` (sección “Barrido de opciones de osciloscopio”).
 
 ---
 

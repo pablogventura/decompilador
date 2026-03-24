@@ -6,6 +6,12 @@ No intenta reemplazar HTSoftDll: resume la captura bulk y expone muestras crudas
 Pistas firmware (FUN_08032140 @ 08032140): si el buffer de muestras no está listo,
 se responden 12 B con un patrón fijo antes de FUN_080342e0; las muestras reales son
 bytes sueltos desde DAT_08032e78 + offset, hasta 0x40 B por petición 0x16.
+
+**Dos canales (2xx2):** en hardware real, el buffer suele venir como **CH1, CH2, CH1, CH2…**
+(un byte por canal y por instante). Tratar todo el flujo como una sola curva u8
+distorsiona métricas y gráficos. Por defecto esta API asume ese entrelazado
+(ver ``split_interleaved_u8``); para un solo canal o depuración, desactivá el
+modo entrelazado en CLI / export.
 """
 
 from __future__ import annotations
@@ -52,6 +58,21 @@ def trim_to_expected(data: bytes, expected_bytes: int | None) -> bytes:
     return data[:n]
 
 
+def split_interleaved_u8(payload: bytes) -> tuple[list[int], list[int]]:
+    """
+    Buffer **u8** en modo dos canales: **CH1, CH2, CH1, CH2…** (un byte por canal
+    e instante). Comportamiento **validado** en 2xx2 al comparar con la vista en vivo.
+
+    Devuelve (CH1, CH2) como listas tomando índices pares / impares del buffer.
+    Si la longitud es impar, el último byte solo entra en CH1.
+    """
+    if not payload:
+        return [], []
+    a = list(payload[0::2])
+    b = list(payload[1::2])
+    return a, b
+
+
 def decode_capture(chunks: List[bytes], expected_bytes: int | None = None) -> Dict[str, object]:
     raw = flatten_chunks(chunks)
     used = trim_to_expected(raw, expected_bytes)
@@ -73,7 +94,12 @@ def decode_capture(chunks: List[bytes], expected_bytes: int | None = None) -> Di
     return out
 
 
-def format_capture_summary(chunks: List[bytes], expected_bytes: int | None = None) -> str:
+def format_capture_summary(
+    chunks: List[bytes],
+    expected_bytes: int | None = None,
+    *,
+    interleaved: bool = True,
+) -> str:
     d = decode_capture(chunks, expected_bytes=expected_bytes)
     lines: List[str] = []
     lines.append(
@@ -82,15 +108,25 @@ def format_capture_summary(chunks: List[bytes], expected_bytes: int | None = Non
     if d.get("expected_bytes") is not None:
         lines.append(f"  bytes esperados (firmware): {d['expected_bytes']}")
     lines.append(
-        f"  rango u8: {d['u8_min']}..{d['u8_max']} | rango i8: {d['i8_min']}..{d['i8_max']}"
+        f"  rango u8 (stream completo): {d['u8_min']}..{d['u8_max']} | rango i8: {d['i8_min']}..{d['i8_max']}"
     )
+    if interleaved:
+        used = trim_to_expected(flatten_chunks(chunks), expected_bytes)
+        ch1, ch2 = split_interleaved_u8(used)
+        if ch1 or ch2:
+            lines.append(
+                f"  modo 2 canales (pares=CH1, impares=CH2): "
+                f"CH1 n={len(ch1)} [{min(ch1) if ch1 else '-'}..{max(ch1) if ch1 else '-'}]  "
+                f"CH2 n={len(ch2)} [{min(ch2) if ch2 else '-'}..{max(ch2) if ch2 else '-'}]"
+            )
     if d.get("firmware_not_ready_first_chunk"):
         lines.append(
             "  primer bloque: patrón firmware «buffer no listo» (12 B) — reintenta captura o espera RUN."
         )
     lines.append(f"  preview_u8[0:32]: {d['preview_u8']}")
     lines.append(
-        "  Nota: muestra cruda (ADC) sin escala de voltaje/tiempo; depende de ch-volt, ch-probe, time-div, etc."
+        "  Nota: ADC crudo sin V; tiempo real depende de time/div. "
+        "Sin --no-interleaved: CSV y --analyze usan CH1/CH2 separados."
     )
     return "\n".join(lines)
 
@@ -157,21 +193,39 @@ def export_scope_csv(
     payload: bytes,
     *,
     dt_seconds: float = 1.0,
+    interleaved: bool = True,
 ) -> int:
     """
-    Escribe un CSV con columnas index, time_s, adc_u8 (muestra cruda 0..255).
+    Escribe CSV para gráficos (LibreOffice, gnuplot).
 
-    Abrí el archivo en LibreOffice / Excel (gráfico dispersión o líneas) o en gnuplot::
+    Con ``interleaved=True`` (default): columnas ``index,time_s,ch1_u8,ch2_u8`` —
+    un instante por fila, dos canales (validado en 2xx2).
 
-        plot 'captura.csv' using 2:3 with lines title 'ADC u8'
+    Con ``interleaved=False``: una sola columna ``adc_u8`` (stream crudo, p. ej. un canal).
 
-    ``time_s = index * dt_seconds``; si conocés el período de muestreo real, pasá ``dt_seconds``.
-    Retorna el número de filas de datos escritas.
+    gnuplot (dos canales): ``plot 'x.csv' using 2:3 title 'CH1', '' using 2:4 title 'CH2'``
     """
     p = Path(path).expanduser()
     dt = float(dt_seconds)
-    lines: List[str] = [
-        "# Hantek OSC — ADC 8 bit crudo (sin calibración a voltios; depende de V/div y sonda)",
+    if interleaved:
+        ch1, ch2 = split_interleaved_u8(payload)
+        n = max(len(ch1), len(ch2))
+        lines: List[str] = [
+            "# Hantek OSC — CH1=bytes pares, CH2=bytes impares (modo dos canales)",
+            "# index,time_s,ch1_u8,ch2_u8",
+            f"# dt_seconds={dt}",
+            "index,time_s,ch1_u8,ch2_u8",
+        ]
+        for i in range(n):
+            t = i * dt
+            c1 = ch1[i] if i < len(ch1) else ""
+            c2 = ch2[i] if i < len(ch2) else ""
+            lines.append(f"{i},{t:.12g},{c1},{c2}")
+        p.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return n
+
+    lines_single: List[str] = [
+        "# Hantek OSC — stream único (sin separar canales); ADC 8 bit crudo",
         "# index,time_s,adc_u8",
         f"# dt_seconds={dt}",
         "index,time_s,adc_u8",
@@ -179,17 +233,20 @@ def export_scope_csv(
     u = list(payload)
     for i, val in enumerate(u):
         t = i * dt
-        lines.append(f"{i},{t:.12g},{val}")
-    p.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        lines_single.append(f"{i},{t:.12g},{val}")
+    p.write_text("\n".join(lines_single) + "\n", encoding="utf-8")
     return len(u)
 
 
-def format_analyze_report(raw: bytes) -> str:
+def _format_analyze_report_single(raw: bytes, *, label: str | None = None) -> str:
     d = analyze_adc_payload(raw)
     if "error" in d:
         return f"Análisis ADC: {d.get('error')}"
+    title = "Análisis ADC (heurístico, sin V/div)"
+    if label:
+        title = f"Análisis {label} (heurístico, sin V/div)"
     lines: List[str] = []
-    lines.append("Análisis ADC (heurístico, sin V/div):")
+    lines.append(f"{title}:")
     lines.append(
         f"  n={d['n']}  min={d['u8_min']}  max={d['u8_max']}  pp={d['pp']:.1f}  "
         f"media={d['mean']:.1f}  rms_ac≈{d['rms_ac']:.2f}"
@@ -209,4 +266,21 @@ def format_analyze_report(raw: bytes) -> str:
     if float(d["pp"]) < 20:
         lines.append("  → Señal muy pequeña en ADC: sube ganancia o amplitud de fuente.")
     return "\n".join(lines)
+
+
+def format_analyze_report(raw: bytes, *, interleaved: bool = True) -> str:
+    if not interleaved:
+        return _format_analyze_report_single(raw)
+    ch1, ch2 = split_interleaved_u8(raw)
+    if not ch1 and not ch2:
+        return _format_analyze_report_single(raw)
+    parts: List[str] = [
+        "Dos canales (CH1 = bytes pares, CH2 = bytes impares). "
+        "Stream monolítico: usá --no-interleaved en get-*-data."
+    ]
+    if ch1:
+        parts.append(_format_analyze_report_single(bytes(ch1), label="CH1"))
+    if ch2:
+        parts.append(_format_analyze_report_single(bytes(ch2), label="CH2"))
+    return "\n\n".join(parts)
 
