@@ -1,0 +1,10 @@
+# Hantek 2xx2: VID 0483 — PID 2d72 (2D72), 2d42 (2D42), …
+# sudo cp 99-hantek-2d42.rules /etc/udev/rules.d/
+# sudo udevadm control --reload-rules && sudo udevadm trigger
+# Desenchufa y enchufa el USB.
+
+# MODE=0666: evita depender de logind/uaccess (SSH, servidores, etc.)
+SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="2d72", MODE="0666", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="2d42", MODE="0666", TAG+="uaccess"
+
+# Otro PID: duplica la línea (idProduct en minúsculas hex, sin 0x).

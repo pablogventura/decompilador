@@ -7,8 +7,10 @@ ghidra_headless_projects/
 *.gpr
 *.rep/
 
-# --- Salida del descompilador y pruebas ---
+# --- Salida del descompilador (no versionar: solo docs + código Python) ---
 decompiled_*/
+firmware/decompilado/
+humanized/
 
 # --- Logs y temporales ---
 *.log
@@ -25,14 +27,33 @@ vgcore.*
 *.stackdump
 hs_err_pid*.log
 
-# --- Binarios de muestra: solo versionamos ls.bin ---
+# --- Binarios (no versionar: solo docs + Python) ---
 *.bin
-!ls.bin
 *.exe
+*.EXE
 *.dll
+*.DLL
 *.dylib
 *.ko
 *.obj
+*.sys
+*.Sys
+*.SYS
+*.cat
+*.dfu
+*.chm
+*.msi
+*.msm
+*.cab
+*.inf
+*.INF
+
+# Paquetes / instaladores sueltos (además de patrones *.exe / *.dll)
+hantek/Bin/
+
+# Salidas locales de pruebas (capturas)
+**/captura_scope.csv
+hantek/notebooks/preview_captura.png
 
 # --- Compilación (C/C++, etc.) ---
 *.o
@@ -52,7 +73,8 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 
-# --- Java (scripts Ghidra compilados a mano, etc.) ---
+# --- Java (scripts Ghidra / fuentes; en repo solo Python + docs) ---
+*.java
 *.class
 target/
 
@@ -75,5 +97,3 @@ target/
 Thumbs.db
 Desktop.ini
 .directory
-ghidra_scripts/ExportAllDecompiled.java
-humanized/main.c

@@ -1,0 +1,79 @@
+***  Installation Started 03/22/2026 20:27  ***
+Title: Hantek-2xx2 Ver1.1.14 Installation
+Source: Z:\home\pablo\mios\decompilador\Setup.EXE | 08-17-2021 | 10:16:52 | 5956840
+Made Dir: C:\Program Files (x86)\Hantek2xx2
+File Copy: C:\Program Files (x86)\Hantek2xx2\UNWISE.EXE | 07-26-2002 | 17:02:06 | | 153088 | 5be5019b
+RegDB Key: Software\Microsoft\Windows\CurrentVersion\Uninstall\Hantek-2xx2 Ver1.1.14
+RegDB Val: Hantek-2xx2 Ver1.1.14
+RegDB Name: DisplayName
+RegDB Root: 2
+RegDB Key: Software\Microsoft\Windows\CurrentVersion\Uninstall\Hantek-2xx2 Ver1.1.14
+RegDB Val: C:\PROG~5P2\HANT~1ID\UNWISE.EXE C:\PROG~5P2\HANT~1ID\INSTALL.LOG
+RegDB Name: UninstallString
+RegDB Root: 2
+File Copy: C:\Program Files (x86)\Hantek2xx2\Scope.exe | 08-17-2021 | 08:25:14 | 1.0.0.1 | 3891200 | a2334071
+File Copy: C:\Program Files (x86)\Hantek2xx2\DSOHelp-English.chm | 12-28-2018 | 15:02:04 | | 1808173 | 5c58a31c
+File Copy: C:\Program Files (x86)\Hantek2xx2\gdiplus.dll | 10-24-2000 | 23:12:42 | 6.1.7601.17514 | 1503232 | 61554be4
+File Copy: C:\Program Files (x86)\Hantek2xx2\HTDecodeDll.dll | 06-01-2016 | 16:52:22 | | 36864 | 8e8c4dd7
+File Copy: C:\Program Files (x86)\Hantek2xx2\HTDisplayDll.dll | 12-10-2020 | 08:19:12 | | 90112 | b753c782
+File Copy: C:\Program Files (x86)\Hantek2xx2\HTETSDll.dll | 09-19-2015 | 17:00:16 | | 45056 | a8bb8eb
+File Copy: C:\Program Files (x86)\Hantek2xx2\HTFFTDll.dll | 08-06-2015 | 10:51:10 | | 53248 | 6ecb2283
+File Copy: C:\Program Files (x86)\Hantek2xx2\HTHardDll.dll | 07-26-2021 | 14:35:00 | | 94208 | de2d6ad
+File Copy: C:\Program Files (x86)\Hantek2xx2\HTLANDll.dll | 09-19-2015 | 17:01:58 | | 65536 | d6d4496
+File Copy: C:\Program Files (x86)\Hantek2xx2\HTNTLVDll.dll | 11-08-2017 | 09:11:52 | | 86016 | b550337f
+File Copy: C:\Program Files (x86)\Hantek2xx2\HTSoftDll.dll | 11-07-2018 | 11:24:48 | | 73728 | 94763b8e
+File Copy: C:\Program Files (x86)\Hantek2xx2\MeasDll.dll | 11-07-2018 | 11:25:28 | | 53248 | 1227b4e8
+File Copy: C:\Program Files (x86)\Hantek2xx2\dpinst.exe | 11-27-2014 | 18:29:32 | 2.1.0.0 | 552528 | af5b33b
+File Copy: C:\Program Files (x86)\Hantek2xx2\dpinst64.exe | 11-27-2014 | 18:29:32 | 2.1.0.0 | 677952 | bf4a1c36
+File Copy: C:\Program Files (x86)\Hantek2xx2\STTubeDevice30.dll | 08-30-2015 | 22:36:52 | 3.0.5.0 | 27136 | 468179a1
+File Copy: C:\Program Files (x86)\Hantek2xx2\STDFUPRT.dll | 08-30-2015 | 23:00:04 | 3.0.5.0 | 28672 | 468f889d
+File Copy: C:\Program Files (x86)\Hantek2xx2\STDFUFiles.dll | 08-30-2015 | 22:50:44 | 3.0.5.0 | 33792 | 7fcd6c75
+File Copy: C:\Program Files (x86)\Hantek2xx2\STDFU.dll | 08-30-2015 | 22:36:56 | 3.0.5.0 | 72704 | 3e0f0dec
+File Copy: C:\Program Files (x86)\Hantek2xx2\HT2000Update.exe | 05-09-2020 | 16:12:56 | 1.0.0.1 | 65536 | 5f31b17e
+Made Dir: C:\Program Files (x86)\Hantek2xx2\Bin
+File Copy: C:\Program Files (x86)\Hantek2xx2\Bin\dpinst.exe | 11-27-2014 | 18:29:32 | 2.1.0.0 | 552528 | af5b33b
+File Copy: C:\Program Files (x86)\Hantek2xx2\Bin\dpinst64.exe | 11-27-2014 | 18:29:32 | 2.1.0.0 | 677952 | bf4a1c36
+File Copy: C:\Program Files (x86)\Hantek2xx2\Bin\DriverSelfInstall.exe | 09-01-2018 | 09:59:42 | | 57344 | d7134e25
+Made Dir: C:\Program Files (x86)\Hantek2xx2\Driver
+Made Dir: C:\Program Files (x86)\Hantek2xx2\Driver\Others
+File Copy: C:\Program Files (x86)\Hantek2xx2\Driver\Others\Hantek2D42.cat | 02-14-2019 | 09:05:30 | | 9416 | 59994b43
+File Copy: C:\Program Files (x86)\Hantek2xx2\Driver\Others\Hantek2D42.inf | 02-14-2019 | 09:05:20 | | 2852 | 18f991e0
+File Copy: C:\Program Files (x86)\Hantek2xx2\Driver\Others\Hantek2D42AMD64.sys | 02-14-2019 | 09:05:30 | 1.0.0.0 | 63616 | cb0c7b2d
+File Copy: C:\Program Files (x86)\Hantek2xx2\Driver\Others\Hantek2D42IA64.sys | 02-14-2019 | 09:05:32 | 1.0.0.0 | 132096 | 164053c
+File Copy: C:\Program Files (x86)\Hantek2xx2\Driver\Others\Hantek2D42X86.sys | 02-14-2019 | 09:05:32 | 1.0.0.0 | 37632 | e624c71e
+Made Dir: C:\Program Files (x86)\Hantek2xx2\Driver\Win10
+File Copy: C:\Program Files (x86)\Hantek2xx2\Driver\Win10\Hantek2D42.cat | 09-03-2018 | 21:46:22 | | 11863 | e4c3ae3f
+File Copy: C:\Program Files (x86)\Hantek2xx2\Driver\Win10\Hantek2D42.inf | 09-04-2018 | 09:34:20 | | 2852 | 18f991e0
+File Copy: C:\Program Files (x86)\Hantek2xx2\Driver\Win10\Hantek2D42AMD64.Sys | 09-03-2018 | 21:46:22 | 1.0.0.0 | 76984 | a56596a2
+File Copy: C:\Program Files (x86)\Hantek2xx2\Driver\Win10\Hantek2D42IA64.sys | 09-03-2018 | 21:46:22 | 1.0.0.0 | 145464 | fdd9d13f
+File Copy: C:\Program Files (x86)\Hantek2xx2\Driver\Win10\Hantek2D42X86.sys | 09-03-2018 | 21:46:24 | 1.0.0.0 | 51000 | e804124e
+Made Dir: C:\Program Files (x86)\Hantek2xx2\Language
+File Copy: C:\Program Files (x86)\Hantek2xx2\Language\Lan_Chinese.lug | 07-03-2019 | 09:38:52 | | 13244 | 546ca32c
+File Copy: C:\Program Files (x86)\Hantek2xx2\Language\Lan_English.lug | 07-03-2019 | 09:38:20 | | 16162 | 117877a8
+Shell Link: C:\users\pablo\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\hante\Hantek2xx2.lnk
+Link Info: C:\PROG~5P2\HANT~1ID\Scope.exe |  |  | 0 | 1 | 0 | 
+Shell Link: C:\users\pablo\Desktop\Hantek2xx2.lnk
+Link Info: C:\PROG~5P2\HANT~1ID\Scope.exe |  |  | 0 | 1 | 0 | 
+Could not Self-Register: C:\Program Files (x86)\Hantek2xx2\STTubeDevice30.dll
+Could not Self-Register: C:\Program Files (x86)\Hantek2xx2\STDFUPRT.dll
+Could not Self-Register: C:\Program Files (x86)\Hantek2xx2\STDFUFiles.dll
+Could not Self-Register: C:\Program Files (x86)\Hantek2xx2\STDFU.dll
+Could not Self-Register: C:\Program Files (x86)\Hantek2xx2\Driver\Others\Hantek2D42AMD64.sys
+Could not Self-Register: C:\Program Files (x86)\Hantek2xx2\Driver\Others\Hantek2D42IA64.sys
+Could not Self-Register: C:\Program Files (x86)\Hantek2xx2\Driver\Others\Hantek2D42X86.sys
+Could not Self-Register: C:\Program Files (x86)\Hantek2xx2\Driver\Win10\Hantek2D42AMD64.Sys
+Could not Self-Register: C:\Program Files (x86)\Hantek2xx2\Driver\Win10\Hantek2D42IA64.sys
+Could not Self-Register: C:\Program Files (x86)\Hantek2xx2\Driver\Win10\Hantek2D42X86.sys
+RegDB Key: Software\Microsoft\Windows\CurrentVersion\Uninstall\Hantek-2xx2 Ver1.1.14
+RegDB Val: 053288703687
+RegDB Name: HelpTelephone
+RegDB Root: 2
+RegDB Key: Software\Microsoft\Windows\CurrentVersion\Uninstall\Hantek-2xx2 Ver1.1.14
+RegDB Val: Qingdao Hantek
+RegDB Name: Publisher
+RegDB Root: 2
+RegDB Key: Software\Microsoft\Windows\CurrentVersion\Uninstall\Hantek-2xx2 Ver1.1.14
+RegDB Val: http://www.hantek.com.cn/
+RegDB Name: Comments
+RegDB Root: 2
+User Rights: Admin
