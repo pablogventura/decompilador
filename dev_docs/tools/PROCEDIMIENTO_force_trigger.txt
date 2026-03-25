@@ -1,0 +1,76 @@
+Force Trigger (manual Hantek 2000 v1.3, ~p.13)
+================================================
+
+Qué dice el manual (PDF v1.3, sección Trigger System)
+------------------------------------------------------
+- **Auto:** **sin** disparo válido, el scope **adquiere “libremente”**; con
+  base **≤ 100 ms/div** permite ver trazas **sin** disparo estable (“untriggered
+  waveforms”).
+- **Normal:** la traza **solo** se actualiza cuando hay disparo válido; hasta
+  entonces puede quedarse la imagen anterior.
+- **Single:** un disparo y para.
+- **Force Trigger (texto inglés):** “Used to **complete an acquisition** regardless
+  of an adequate trigger signal.” O sea, en papel es **forzar una captura** cuando
+  el disparo no se cumple, **no** un modo distinto. Añade: el botón “es inútil
+  si la adquisición **ya está parada**”.
+
+Qué contás en el 2D42 (empírico)
+--------------------------------
+Tras usar Force, el equipo **sigue en RUN** (“on”) y la onda **corre** como si
+**no** respetara el disparo — muy parecido a lo que el manual describe para
+**modo Auto** (adquisición libre sin trigger válido), no a “un solo disparo forzado”.
+
+Interpretación razonable
+------------------------
+1. **El firmware puede implementar Force como “soltar” el bloqueo de Normal**:
+   pasar a comportamiento tipo **free-run / Auto** hasta el próximo cambio de
+   modo, no solo un único sweep.
+2. **La tecla que pulsaste puede no ser solo “Force”** sino una que también
+   pone **Auto** o afecta horizontal (Roll/Scan a 100 ms/div da sensación de
+   onda que se dibuja sola).
+3. Conviene **leer en LCD** el modo de disparo **justo después** de Force y
+   comparar con `read-settings --parse` → `ram9c_byte6` (**0=Auto, 1=Normal,
+   2=Single** en la tabla empírica del repo).
+
+Recomendación práctica (2D42, uso en banco)
+-------------------------------------------
+En **Normal** + **Force** en panel, el comportamiento observado fue: equipo en
+**RUN**, onda **“corriendo”** como si no hubiera trigger estable — cercano al
+texto del manual para **Auto**, no a “una sola captura forzada”.
+
+En **Single**, el mismo tipo de prueba se sintió **más alineado** con la idea del
+manual (“completar una adquisición”): **un disparo / una traza** y cese hasta
+rearmar, en lugar de barrido continuo. Para reproducir el efecto descrito en el PDF
+sin depender solo de Force en Normal, **probar primero Single** en el menú Trig.
+
+**No** es lo mismo que **scope-zero-cali** / opcode USB **0x17** (calibración).
+
+Cómo ayudar a probar (sin sniff en PC)
+---------------------------------------
+1. Dejá el Hantek en **osciloscopio** y **RUN** (play).
+2. Menú **Trig** en el equipo:
+   - Modo **Normal** (no Auto). Por USB ya dejamos `set-trig-sweep` en Normal.
+   - Nivel de disparo muy alto o muy bajo respecto de CH1, **o** dejá CH1 casi
+     sin señal, para que **no** dispare fácil.
+3. Cuando la traza esté “congelada” o no actualice:
+   - Pulsá **Force Trigger** en el menú del equipo (según tu modelo: suele estar
+     en el menú de disparo / tecla suave; el PDF habla de “Force Trigger” como acción).
+4. Inmediatamente después, sin tocar otras cosas, ejecutá el segundo snapshot
+   (ver comandos abajo).
+
+Comandos (desde carpeta pyhantek/)
+--------------------------------
+  # Paso A — ya lo puede haber hecho el asistente; si no:
+  .venv/bin/python -m hantek_usb.cli set-mode osc
+  .venv/bin/python -m hantek_usb.cli run-stop --run
+  .venv/bin/python -m hantek_usb.cli set-trig-sweep 1
+  .venv/bin/python tools/snapshot_scope_state.py -o captures/force_trig_A_antes.json --note "antes Force panel"
+
+  # … pulsás Force Trigger en el panel …
+
+  .venv/bin/python tools/snapshot_scope_state.py -o captures/force_trig_B_despues.json --note "despues Force panel"
+
+  .venv/bin/python tools/compare_scope_snapshots.py captures/force_trig_A_antes.json captures/force_trig_B_despues.json
+
+Si **no cambia ningún byte** en read-settings, el Force probablemente no pasa
+por el bloque 0x15 (solo FPGA/adquisición interna) y habrá que seguir por firmware.

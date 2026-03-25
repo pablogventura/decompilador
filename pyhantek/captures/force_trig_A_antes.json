@@ -1,0 +1,35 @@
+{
+  "created_utc": "2026-03-25T22:57:27.060478+00:00",
+  "note": "Normal USB; pulsar Force en panel luego paso B",
+  "usb": {
+    "bus": null,
+    "address": null
+  },
+  "response_64_hex": "5519001501000000079601000000053201000e960000000195",
+  "settings_25_hex": "5519001501000000079601000000053201000e960000000195",
+  "payload_21_hex": "01000000079601000000053201000e960000000195",
+  "firmware25_valid": true,
+  "fields_u8": {
+    "ram94_u16_0x06_lo": 1,
+    "ram94_u16_0x18_lo": 0,
+    "ram94_u16_0x1e_lo": 0,
+    "ram94_u16_0x2a_lo": 0,
+    "ram94_u16_0x42_lo": 7,
+    "ram94_u16_0x3c_lo_plus_d": 150,
+    "ram94_u16_0x50_lo": 1,
+    "ram94_u16_0x62_lo": 0,
+    "ram94_u16_0x68_lo": 0,
+    "ram94_u16_0x74_lo": 0,
+    "ram94_u16_0x8c_lo": 5,
+    "ram94_u16_0x86_lo_plus_d": 50,
+    "ram90_byte_at_2": 1,
+    "ram98_byte0": 0,
+    "ram98_byte3": 14,
+    "ram98_word9_lo": 150,
+    "ram98_word9_hi": 0,
+    "ram9c_byte0": 0,
+    "ram9c_byte3": 0,
+    "ram9c_byte6": 1,
+    "ram9c_byte9_plus_d": 149
+  }
+}

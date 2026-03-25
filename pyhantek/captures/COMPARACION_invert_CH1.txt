@@ -1,0 +1,49 @@
+Comparación read-settings (payload 21 B @ [4:25]) — invert CH1 en menú
+======================================================================
+
+Captura A — CH1 no invertido (pantalla)
+  Archivo: estado_read_settings_20260325T223927Z_ch1_no_invertido.txt
+  Último byte (ram9c_byte9_plus_d): 0x97
+
+Captura B — CH1 invertido (pantalla)
+  Archivo: estado_read_settings_20260325T224011Z_ch1_invertido.txt
+  Último byte: 0x95
+
+Diff
+----
+Los 20 primeros bytes del payload son idénticos; solo cambia el índice 20:
+
+  ... 0e 96 00 00 00 00 97   (no invertido)
+  ... 0e 96 00 00 00 00 95   (invertido)
+
+  0x97 XOR 0x02 = 0x95  →  solo conmuta el bit 1 del byte.
+
+USB
+---
+Opcode FUN_04440 write: [4]=0x18, [5]=nuevo_byte, [3]=0, 1 byte de carga.
+
+  - Tras enviar 0x18 con 0x97 o 0x95, read-settings reproduce el valor.
+  - ``ch-invert 0`` (default): read-settings → ram9c_byte9 XOR 0x02 → 0x18.
+
+Nota sobre otra sesión (repo, antes)
+------------------------------------
+En otra prueba solo-menú se vio la pareja 0x9d / 0x8f (XOR = 0x12, no 0x02).
+Ese byte mezcla más de un concepto según estado del equipo; si XOR 0x02 no
+refleja el menú, probá ``--xor-mask 0x12`` o capturá tu propia pareja y
+usá ``--raw-byte``.
+
+Estado USB (2026-03) — NO listo para uso
+----------------------------------------
+En 2D42, enviar opcode ``0x18`` (p. ej. ``ch-invert 0`` / XOR sobre ``ram9c_byte9``)
+**no** es un sustituto del menú: en prueba de usuario **rompe o desincroniza el
+disparo** (traza inestable / “se mueve la señal”). El byte en ``read-settings``
+sigue siendo correlación **lectura** menú ↔ RAM; falta la **trama o secuencia
+correcta** que el firmware aplique igual que la UI (posible otro campo, orden,
+o rama en ``FUN_0801ef70``). **Pendiente:** más RE en firmware/DLL y diff
+``read-settings`` al togglear invert solo desde el panel (sin capturar el bus en PC).
+
+Qué nos falta (resumen)
+-----------------------
+- Orden USB que replique el invert **sin** alterar estabilidad del trigger.
+- Confirmar si ``ram9c[9]`` es solo espejo para host o si la escritura por ``0x18``
+  deja el bloque ``DAT_0803269c`` incoherente respecto al motor de adquisición.

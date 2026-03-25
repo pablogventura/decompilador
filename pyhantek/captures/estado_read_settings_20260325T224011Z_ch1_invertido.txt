@@ -1,0 +1,43 @@
+=== Captura estado USB — dsoHTReadAllSet (read-settings) ===
+Contexto: usuario confirma CH1 invertido en pantalla.
+UTC: 2026-03-25T22:40:11.394082+00:00
+
+Petición (10 B): 00 0a 00 01 15 00 00 00 00 00
+Respuesta IN (64 B): 55 19 00 15 01 00 00 00 07 96 01 00 00 00 05 32 01 00 0e 96 00 00 00 00 95
+Payload 21 B @ [4:25]: 01 00 00 00 07 96 01 00 00 00 05 32 01 00 0e 96 00 00 00 00 95
+
+--- FUN_08032140 (firmware): payload 21 B @ [4:25] → estado RAM ---
+  [ram94_u16_0x06_lo] = 0x01 (1)
+  [ram94_u16_0x18_lo] = 0x00 (0)
+  [ram94_u16_0x1e_lo] = 0x00 (0)
+  [ram94_u16_0x2a_lo] = 0x00 (0)
+  [ram94_u16_0x42_lo] = 0x07 (7)
+  [ram94_u16_0x3c_lo_plus_d] = 0x96 (150)  |  (valor−100)&0xff = 0x32
+  [ram94_u16_0x50_lo] = 0x01 (1)
+  [ram94_u16_0x62_lo] = 0x00 (0)
+  [ram94_u16_0x68_lo] = 0x00 (0)
+  [ram94_u16_0x74_lo] = 0x00 (0)
+  [ram94_u16_0x8c_lo] = 0x05 (5)
+  [ram94_u16_0x86_lo_plus_d] = 0x32 (50)  |  (valor−100)&0xff = 0xce
+  [ram90_byte_at_2] = 0x01 (1)
+  [ram98_byte0] = 0x00 (0)  |  horiz=Y-T (empírico)
+  [ram98_byte3] = 0x0e (14)  |  time/div=200.0us/div
+  [ram98_word9_lo] = 0x96 (150)
+  [ram98_word9_hi] = 0x00 (0)
+  [ram9c_byte0] = 0x00 (0)
+  [ram9c_byte3] = 0x00 (0)  |  trig_slope=rising
+  [ram9c_byte6] = 0x00 (0)  |  trig_sweep=Auto
+  [ram9c_byte9_plus_d] = 0x95 (149)  |  (valor−100)&0xff = 0x31
+  Referencia opcodes ``FUN_04440`` / canales: cruzar con ``Opcodes04440`` en protocol.py y con ``FUN_08031a9e`` (escritura por opcode en ``DAT_08032694``).
+---
+Longitud: 25 byte(s)
+Hex: 55 19 00 15 01 00 00 00 07 96 01 00 00 00 05 32 01 00 0e 96 00 00 00 00 95
+Prefijo 0x55: mismo «mundo» que la cabecera 55 0A de captura (PROTOCOLO_USB.md); aquí es respuesta del firmware.
+Byte [1]=0x19: en muchas respuestas de este modelo acompaña a 0x55 (tipo/longitud interna).
+Campos [2:4] = 00 15: suelen describir la orden consultada o un sub-bloque.
+→ Respuesta a **dsoHTReadAllSet** (subcomando 0x15 en la petición de 10 B). El firmware STM32 arma **25 B** totales: ``[0]=0x55``, ``[1]=0x19`` (longitud), ``[3]=0x15``, **21 B** de estado en ``[4:25]`` (ver ``FUN_08032140`` en ``firmware/decompilado/``).
+  Primeros 21 B (coinciden con lo que el DLL copia a estado): 5519001501000000079601000000053201000e9600
+  Tabla campo a campo (RAM ``DAT_08032694`` / ``98`` / ``9c``): ``read-settings --parse`` o ``parse_resp.format_read_all_set_firmware_decode``.
+  Nota: u32 LE [4:8]=1 (0x00000001) **no** es un único registro lógico; el firmware envía **bytes sueltos** (ver ``decode_read_all_set_firmware25``).
+  Igual para u32 LE [8:12]=103943 (0x00019607).
+--- subcomando CLI: settings ---

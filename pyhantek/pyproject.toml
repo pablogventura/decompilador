@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyhantek"
+version = "0.1.0"
+description = "CLI y librería USB (pyusb) para Hantek 2D42/2D72 y familia 2xx2"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Proyecto decompilador Hantek" }]
+keywords = ["hantek", "usb", "oscilloscope", "2d42", "2d72"]
+dependencies = [
+    "pyusb>=1.2.1",
+    "matplotlib>=3.5",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+hantek = "hantek_usb.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["hantek_usb*"]

@@ -1,4 +1,4 @@
-# Ghidra no se versiona: obtener con scripts/install_decompilador.sh (descarga + unzip local).
+# Ghidra no se versiona: obtener con dev_scripts/install_decompilador.sh (descarga + unzip local).
 ghidra_*_PUBLIC/
 ghidra*.zip
 
@@ -10,6 +10,8 @@ ghidra_headless_projects/
 # --- Salida del descompilador (no versionar: solo docs + código Python) ---
 decompiled_*/
 firmware/decompilado/
+# Ghidra / export bajo hantek/ (p. ej. decompilado_HTHardDll)
+hantek/decompilado*/
 humanized/
 
 # --- Logs y temporales ---

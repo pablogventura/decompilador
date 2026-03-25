@@ -1,0 +1,131 @@
+=== ReportPoolTableXrefs (Hantek time/div pool) ===
+Programa: HantekHTX2021090901.bin
+
+--- Referencias a direcciones ROM (pool) ---
+
+>> 0x0800fecc  (ROM pool)
+    [R] desde 0800f6dc  tipo=READ  función=FUN_0800f6a8
+    [R] desde 0800f6ee  tipo=READ  función=FUN_0800f6a8
+    [R] desde 0800f61e  tipo=READ  función=FUN_0800f61c
+    [R] desde 0800f808  tipo=READ  función=FUN_0800f7c4
+    [R] desde 0800f8f2  tipo=READ  función=FUN_0800f8e2
+    [R] desde 0800fa4a  tipo=READ  función=FUN_0800fa3c
+    [R] desde 0800fdf4  tipo=READ  función=FUN_0800fdaa
+    [R] desde 0800fae8  tipo=READ  función=FUN_0800face
+    [R] desde 0800fc48  tipo=READ  función=FUN_0800fc3a
+    [R] desde 0800fe36  tipo=READ  función=FUN_0800fe30
+    [R] desde 0800fe5c  tipo=READ  función=FUN_0800fe52
+    [R] desde 0800fcce  tipo=READ  función=FUN_0800fcc6
+    [R] desde 0800fe82  tipo=READ  función=FUN_0800fe80
+    [R] desde 0800fd70  tipo=READ  función=FUN_0800fd64
+    [R] desde 0800fd1c  tipo=READ  función=FUN_0800fd14
+    [R] desde 0800f5e4  tipo=READ  función=FUN_0800f5e4
+    total: 16 (escrituras ~0)
+
+>> 0x0800fed8  (ROM pool)
+    [R] desde 0800f638  tipo=READ  función=FUN_0800f61c
+    [R] desde 0800f656  tipo=READ  función=FUN_0800f61c
+    [R] desde 0800fe8c  tipo=READ  función=FUN_0800fe80
+    total: 3 (escrituras ~0)
+
+>> 0x0800fedc  (ROM pool)
+    [R] desde 0800f676  tipo=READ  función=FUN_0800f61c
+    [R] desde 0800f694  tipo=READ  función=FUN_0800f61c
+    [R] desde 0800fe9c  tipo=READ  función=FUN_0800fe80
+    total: 3 (escrituras ~0)
+
+>> 0x0800fee4  (ROM pool)
+    [R] desde 0800f714  tipo=READ  función=FUN_0800f6a8
+    [R] desde 0800f82e  tipo=READ  función=FUN_0800f7c4
+    [R] desde 0800fd7a  tipo=READ  función=FUN_0800fd64
+    total: 3 (escrituras ~0)
+
+>> 0x0800fee8  (ROM pool)
+    [R] desde 0800f778  tipo=READ  función=FUN_0800f6a8
+    [R] desde 0800f894  tipo=READ  función=FUN_0800f7c4
+    [R] desde 0800fd86  tipo=READ  función=FUN_0800fd64
+    total: 3 (escrituras ~0)
+
+--- SRAM: crear bloque y re-análisis ---
+Creado SRAM 20000000 .. 2001ffff (R/W, no X)
+reAnalyzeAll + startAnalysis + waitForAnalysis: hecho.
+
+--- Referencias a direcciones SRAM (tras mapa + análisis) ---
+(Las escrituras indirectas pueden seguir sin xref.)
+
+>> 0x2000ca4c  (SRAM)
+    [R] desde 0800f622  tipo=READ  función=FUN_0800f61c
+    [R] desde 0800f6f2  tipo=READ  función=FUN_0800f6a8
+    [R] desde 0801119e  tipo=PARAM  función=FUN_0801115e
+    [R] desde 0801d6d6  tipo=READ  función=FUN_0801cf94
+    [R] desde 0801d9d0  tipo=READ  función=FUN_0801cf94
+    [R] desde 0801d90e  tipo=READ  función=FUN_0801cf94
+    [R] desde 0801d226  tipo=READ  función=FUN_0801cf94
+    [R] desde 0801d58a  tipo=READ  función=FUN_0801cf94
+    [R] desde 0801d4e0  tipo=READ  función=FUN_0801cf94
+    [R] desde 0800f80c  tipo=READ  función=FUN_0800f7c4
+    [R] desde 0800fd72  tipo=READ  función=FUN_0800fd64
+    [R] desde 0800fe84  tipo=READ  función=FUN_0800fe80
+    [R] desde 080103e0  tipo=READ  función=FUN_080103d8
+    [W] desde 080132d8  tipo=WRITE  función=FUN_08013210
+    [R] desde 080176a0  tipo=PARAM  función=FUN_08017686
+    [R] desde 0800cf0a  tipo=READ  función=FUN_0800ce88
+    [R] desde 0801032c  tipo=READ  función=FUN_08010320
+    [R] desde 080067aa  tipo=READ  función=FUN_08006796
+    [R] desde 0801038e  tipo=READ  función=FUN_08010382
+    [W] desde 0800f5ea  tipo=WRITE  función=FUN_0800f5e4
+    [R] desde 0800f5e4  tipo=DATA  función=FUN_0800f5e4
+    [W] desde 0801429a  tipo=WRITE  función=FUN_08014210
+    [R] desde 08014396  tipo=PARAM  función=FUN_08014210
+    [W] desde 080142ca  tipo=WRITE  función=FUN_08014210
+    [R] desde 0802136c  tipo=PARAM  función=FUN_08021228
+    [R] desde 080148fc  tipo=PARAM  función=FUN_08014868
+    [R] desde 08021542  tipo=PARAM  función=FUN_08021460
+    [R] desde 08031fa2  tipo=PARAM  función=FUN_08031a9e
+    [R] desde 08021bda  tipo=READ  función=FUN_08021a8c
+    [W] desde 08021d06  tipo=WRITE  función=FUN_08021a8c
+    [R] desde 0802180a  tipo=READ  función=FUN_080216bc
+    [R] desde 08020de6  tipo=PARAM  función=FUN_08020cb0
+    [R] desde 08020dec  tipo=READ  función=FUN_08020cb0
+    [R] desde 08020e32  tipo=READ  función=FUN_08020cb0
+    [R] desde 08035344  tipo=READ  función=FUN_080352d8
+    [R] desde 0802023e  tipo=PARAM  función=FUN_0802012a
+    [W] desde 08034e66  tipo=WRITE  función=FUN_08034d50
+    [R] desde 08034494  tipo=PARAM  función=FUN_08034340
+    [R] desde 08032496  tipo=READ  función=FUN_08032140
+    [R] desde 08032368  tipo=READ  función=FUN_08032140
+    [R] desde 08020794  tipo=READ  función=FUN_08020778
+    [R] desde 080147f2  tipo=PARAM  función=FUN_08014788
+    [R] desde 080349d4  tipo=PARAM  función=FUN_08034984
+    [R] desde 080349e6  tipo=PARAM  función=FUN_08034984
+    [R] desde 08034a1c  tipo=PARAM  función=FUN_08034984
+    [R] desde 08034a0a  tipo=PARAM  función=FUN_08034984
+    [R] desde 080349f8  tipo=PARAM  función=FUN_08034984
+    [W] desde 08017890  tipo=WRITE  función=FUN_080177fc
+    total: 48 (escrituras ~7)
+
+>> 0x20001ca8  (SRAM)
+    [R] desde 0800f640  tipo=DATA  función=FUN_0800f61c
+    [R] desde 0800f65c  tipo=DATA  función=FUN_0800f61c
+    [R] desde 0800fe92  tipo=DATA  función=FUN_0800fe80
+    total: 3 (escrituras ~0)
+
+>> 0x20001c84  (SRAM)
+    [R] desde 0800f67e  tipo=DATA  función=FUN_0800f61c
+    [R] desde 0800f69a  tipo=DATA  función=FUN_0800f61c
+    [R] desde 0800fea2  tipo=DATA  función=FUN_0800fe80
+    total: 3 (escrituras ~0)
+
+>> 0x20001bfc  (SRAM)
+    [R] desde 0800fd80  tipo=DATA  función=FUN_0800fd64
+    [R] desde 0800f71c  tipo=DATA  función=FUN_0800f6a8
+    [R] desde 0800f838  tipo=DATA  función=FUN_0800f7c4
+    total: 3 (escrituras ~0)
+
+>> 0x20001b74  (SRAM)
+    [R] desde 0800fd8c  tipo=DATA  función=FUN_0800fd64
+    [R] desde 0800f780  tipo=DATA  función=FUN_0800f6a8
+    [R] desde 0800f89e  tipo=DATA  función=FUN_0800f7c4
+    total: 3 (escrituras ~0)
+
+Nota: [R]=lectura [W]=escritura (según RefType de Ghidra).

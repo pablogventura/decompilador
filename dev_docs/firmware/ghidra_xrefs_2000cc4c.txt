@@ -1,0 +1,87 @@
+=== ReportPoolTableXrefs (Hantek time/div pool) ===
+Programa: HantekHTX2021090901.bin
+
+--- Referencias a direcciones ROM (pool) ---
+0x0800fecc  (ROM pool) — sin memoria en esta dirección
+0x0800fed8  (ROM pool) — sin memoria en esta dirección
+0x0800fedc  (ROM pool) — sin memoria en esta dirección
+0x0800fee4  (ROM pool) — sin memoria en esta dirección
+0x0800fee8  (ROM pool) — sin memoria en esta dirección
+
+--- SRAM: crear bloque y re-análisis ---
+Creado SRAM 20000000 .. 2001ffff (R/W, no X)
+reAnalyzeAll + startAnalysis + waitForAnalysis: hecho.
+
+--- Referencias a direcciones SRAM (tras mapa + análisis) ---
+(Las escrituras indirectas pueden seguir sin xref.)
+
+>> 0x2000ca4c  (SRAM)
+    [R] desde 0000a622  tipo=READ  función=FUN_0000a61c
+    [R] desde 0000a6f2  tipo=READ  función=FUN_0000a6a8
+    [R] desde 0000c19e  tipo=PARAM  función=FUN_0000c15e
+    [R] desde 000186d6  tipo=READ  función=FUN_00017f94
+    [R] desde 000189d0  tipo=READ  función=FUN_00017f94
+    [R] desde 0001890e  tipo=READ  función=FUN_00017f94
+    [R] desde 00018226  tipo=READ  función=FUN_00017f94
+    [R] desde 0001858a  tipo=READ  función=FUN_00017f94
+    [R] desde 000184e0  tipo=READ  función=FUN_00017f94
+    [R] desde 0000a80c  tipo=READ  función=FUN_0000a7c4
+    [W] desde 0000e2d8  tipo=WRITE  función=FUN_0000e210
+    [R] desde 00007f0a  tipo=READ  función=FUN_00007e88
+    [R] desde 000126a0  tipo=PARAM  función=FUN_00012686
+    [R] desde 0000ae84  tipo=READ  función=FUN_0000ae80
+    [R] desde 0000b32c  tipo=READ  función=FUN_0000b320
+    [R] desde 0000b3e0  tipo=READ  función=FUN_0000b3d8
+    [R] desde 0000ad72  tipo=READ  función=FUN_0000ad64
+    [R] desde 000017aa  tipo=READ  función=FUN_00001796
+    [R] desde 0000b38e  tipo=READ  función=FUN_0000b382
+    [W] desde 0000a5ea  tipo=WRITE  función=FUN_0000a5e4
+    [R] desde 0000a5e4  tipo=DATA  función=FUN_0000a5e4
+    [R] desde 00006f40  tipo=DATA  función=?
+    [R] desde 00012d7c  tipo=DATA  función=?
+    [R] desde 0001b794  tipo=READ  función=FUN_0001b778
+    [W] desde 00012890  tipo=WRITE  función=FUN_000127fc
+    [R] desde 0001bde6  tipo=PARAM  función=FUN_0001bcb0
+    [R] desde 0001bdec  tipo=READ  función=FUN_0001bcb0
+    [R] desde 0001be32  tipo=READ  función=FUN_0001bcb0
+    [R] desde 0001cbda  tipo=READ  función=FUN_0001ca8c
+    [W] desde 0001cd06  tipo=WRITE  función=FUN_0001ca8c
+    [W] desde 0000f29a  tipo=WRITE  función=FUN_0000f210
+    [R] desde 0000f396  tipo=PARAM  función=FUN_0000f210
+    [W] desde 0000f2ca  tipo=WRITE  función=FUN_0000f210
+    [R] desde 0002d698  tipo=DATA  función=?
+    [R] desde 0002f494  tipo=PARAM  función=FUN_0002f340
+    [R] desde 0002f9d4  tipo=PARAM  función=FUN_0002f984
+    [R] desde 0002f9e6  tipo=PARAM  función=FUN_0002f984
+    [R] desde 0002fa1c  tipo=PARAM  función=FUN_0002f984
+    [R] desde 0002fa0a  tipo=PARAM  función=FUN_0002f984
+    [R] desde 0002f9f8  tipo=PARAM  función=FUN_0002f984
+    [W] desde 0002fe66  tipo=WRITE  función=FUN_0002fd50
+    [R] desde 00031ee0  tipo=DATA  función=?
+    total: 42 (escrituras ~7)
+
+>> 0x20001ca8  (SRAM)
+    [R] desde 0000a640  tipo=DATA  función=FUN_0000a61c
+    [R] desde 0000a65c  tipo=DATA  función=FUN_0000a61c
+    [R] desde 0000ae92  tipo=DATA  función=FUN_0000ae80
+    total: 3 (escrituras ~0)
+
+>> 0x20001c84  (SRAM)
+    [R] desde 0000a67e  tipo=DATA  función=FUN_0000a61c
+    [R] desde 0000a69a  tipo=DATA  función=FUN_0000a61c
+    [R] desde 0000aea2  tipo=DATA  función=FUN_0000ae80
+    total: 3 (escrituras ~0)
+
+>> 0x20001bfc  (SRAM)
+    [R] desde 0000ad80  tipo=DATA  función=FUN_0000ad64
+    [R] desde 0000a71c  tipo=DATA  función=FUN_0000a6a8
+    [R] desde 0000a838  tipo=DATA  función=FUN_0000a7c4
+    total: 3 (escrituras ~0)
+
+>> 0x20001b74  (SRAM)
+    [R] desde 0000ad8c  tipo=DATA  función=FUN_0000ad64
+    [R] desde 0000a780  tipo=DATA  función=FUN_0000a6a8
+    [R] desde 0000a89e  tipo=DATA  función=FUN_0000a7c4
+    total: 3 (escrituras ~0)
+
+Nota: [R]=lectura [W]=escritura (según RefType de Ghidra).

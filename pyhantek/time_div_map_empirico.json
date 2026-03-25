@@ -1,0 +1,257 @@
+{
+  "captured_at": "2026-03-24",
+  "source": "Barrido manual guiado por USB (TIME_DIV write + lectura visual de pantalla)",
+  "notes": [
+    "El índice USB se confirmó con read_all_settings (ram98_byte3).",
+    "Los valores de pantalla los reportó el operador manualmente.",
+    "Rango confirmado en esta sesión: idx 0..34.",
+    "Rango usable de UI: idx 0..33; idx 34 rompe formato de pantalla."
+  ],
+  "entries": [
+    {
+      "idx": 0,
+      "ram98_byte3": 0,
+      "screen_t_offset": "-0.400ns",
+      "screen_time": "5.000ns",
+      "status": "ok"
+    },
+    {
+      "idx": 1,
+      "ram98_byte3": 1,
+      "screen_t_offset": "-0.800ns",
+      "screen_time": "10.000ns",
+      "status": "ok"
+    },
+    {
+      "idx": 2,
+      "ram98_byte3": 2,
+      "screen_t_offset": "-1.600ns",
+      "screen_time": "20.00ns",
+      "status": "ok"
+    },
+    {
+      "idx": 3,
+      "ram98_byte3": 3,
+      "screen_t_offset": "-4.000ns",
+      "screen_time": "50.00ns",
+      "status": "ok"
+    },
+    {
+      "idx": 4,
+      "ram98_byte3": 4,
+      "screen_t_offset": "-8.000ns",
+      "screen_time": "100.0ns",
+      "status": "ok"
+    },
+    {
+      "idx": 5,
+      "ram98_byte3": 5,
+      "screen_t_offset": "-16.00ns",
+      "screen_time": "200.0ns",
+      "status": "ok"
+    },
+    {
+      "idx": 6,
+      "ram98_byte3": 6,
+      "screen_t_offset": "-40.00ns",
+      "screen_time": "500.0ns",
+      "status": "ok"
+    },
+    {
+      "idx": 7,
+      "ram98_byte3": 7,
+      "screen_t_offset": "-80.00ns",
+      "screen_time": "1.000us",
+      "status": "ok"
+    },
+    {
+      "idx": 8,
+      "ram98_byte3": 8,
+      "screen_t_offset": "-160.0ns",
+      "screen_time": "2.000us",
+      "status": "ok"
+    },
+    {
+      "idx": 9,
+      "ram98_byte3": 9,
+      "screen_t_offset": "-400.0ns",
+      "screen_time": "5.000us",
+      "status": "ok"
+    },
+    {
+      "idx": 10,
+      "ram98_byte3": 10,
+      "screen_t_offset": "-800.0ns",
+      "screen_time": "10.00us",
+      "status": "ok"
+    },
+    {
+      "idx": 11,
+      "ram98_byte3": 11,
+      "screen_t_offset": "-1.600us",
+      "screen_time": "20.00us",
+      "status": "ok"
+    },
+    {
+      "idx": 12,
+      "ram98_byte3": 12,
+      "screen_t_offset": "-4.000us",
+      "screen_time": "50.00us",
+      "status": "ok"
+    },
+    {
+      "idx": 13,
+      "ram98_byte3": 13,
+      "screen_t_offset": "-8.000us",
+      "screen_time": "100.0us",
+      "status": "ok"
+    },
+    {
+      "idx": 14,
+      "ram98_byte3": 14,
+      "screen_t_offset": "-16.00us",
+      "screen_time": "200.0us",
+      "status": "ok"
+    },
+    {
+      "idx": 15,
+      "ram98_byte3": 15,
+      "screen_t_offset": "-40.00us",
+      "screen_time": "500us",
+      "status": "ok"
+    },
+    {
+      "idx": 16,
+      "ram98_byte3": 16,
+      "screen_t_offset": "-80.00us",
+      "screen_time": "1.000ms",
+      "status": "ok"
+    },
+    {
+      "idx": 17,
+      "ram98_byte3": 17,
+      "screen_t_offset": "-160.0us",
+      "screen_time": "2.000ms",
+      "status": "ok"
+    },
+    {
+      "idx": 18,
+      "ram98_byte3": 18,
+      "screen_t_offset": "-400.0us",
+      "screen_time": "5.000ms",
+      "status": "ok"
+    },
+    {
+      "idx": 19,
+      "ram98_byte3": 19,
+      "screen_t_offset": "-800.0us",
+      "screen_time": "10.00ms",
+      "status": "ok"
+    },
+    {
+      "idx": 20,
+      "ram98_byte3": 20,
+      "screen_t_offset": "-1.6ms",
+      "screen_time": "20ms",
+      "status": "ok"
+    },
+    {
+      "idx": 21,
+      "ram98_byte3": 21,
+      "screen_t_offset": "-4.000ms",
+      "screen_time": "50ms",
+      "status": "ok"
+    },
+    {
+      "idx": 22,
+      "ram98_byte3": 22,
+      "screen_t_offset": "-8.000ms",
+      "screen_time": "100ms",
+      "status": "ok"
+    },
+    {
+      "idx": 23,
+      "ram98_byte3": 23,
+      "screen_t_offset": "-16.00ms",
+      "screen_time": "200ms",
+      "status": "ok"
+    },
+    {
+      "idx": 24,
+      "ram98_byte3": 24,
+      "screen_t_offset": "-40.00ms",
+      "screen_time": "500ms",
+      "status": "ok"
+    },
+    {
+      "idx": 25,
+      "ram98_byte3": 25,
+      "screen_t_offset": "-80.00ms",
+      "screen_time": "1.000s",
+      "status": "ok"
+    },
+    {
+      "idx": 26,
+      "ram98_byte3": 26,
+      "screen_t_offset": "-160.0ms",
+      "screen_time": "2.000s",
+      "status": "ok"
+    },
+    {
+      "idx": 27,
+      "ram98_byte3": 27,
+      "screen_t_offset": "-400.0ms",
+      "screen_time": "5.000s",
+      "status": "ok"
+    },
+    {
+      "idx": 28,
+      "ram98_byte3": 28,
+      "screen_t_offset": "-800.0ms",
+      "screen_time": "10.00s",
+      "status": "ok"
+    },
+    {
+      "idx": 29,
+      "ram98_byte3": 29,
+      "screen_t_offset": "-1.600s",
+      "screen_time": "20.00s",
+      "status": "ok"
+    },
+    {
+      "idx": 30,
+      "ram98_byte3": 30,
+      "screen_t_offset": "-4.000s",
+      "screen_time": "50.00s",
+      "status": "ok"
+    },
+    {
+      "idx": 31,
+      "ram98_byte3": 31,
+      "screen_t_offset": "-8.000s",
+      "screen_time": "100.0s",
+      "status": "ok"
+    },
+    {
+      "idx": 32,
+      "ram98_byte3": 32,
+      "screen_t_offset": "-16.00s",
+      "screen_time": "200.0s",
+      "status": "ok"
+    },
+    {
+      "idx": 33,
+      "ram98_byte3": 33,
+      "screen_t_offset": "-40.00s",
+      "screen_time": "500.0s",
+      "status": "ok"
+    },
+    {
+      "idx": 34,
+      "ram98_byte3": 34,
+      "screen_t_offset": "-0.000ns",
+      "screen_time": "ns",
+      "status": "invalid_ui"
+    }
+  ]
+}

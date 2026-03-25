@@ -1,0 +1,44 @@
+{
+  "created_at": "2026-03-24T22:39:28",
+  "kind": "yt",
+  "values": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "rows": [
+    {
+      "kind": "yt",
+      "idx_sent": 0,
+      "ram98_byte3": 11,
+      "label": "yt",
+      "note": "",
+      "ts": "2026-03-24T22:39:01"
+    },
+    {
+      "kind": "yt",
+      "idx_sent": 1,
+      "ram98_byte3": 11,
+      "label": "yt",
+      "note": "",
+      "ts": "2026-03-24T22:39:16"
+    },
+    {
+      "kind": "yt",
+      "idx_sent": 2,
+      "ram98_byte3": 11,
+      "label": "yt",
+      "note": "",
+      "ts": "2026-03-24T22:39:23"
+    },
+    {
+      "kind": "yt",
+      "idx_sent": 3,
+      "ram98_byte3": 11,
+      "label": "yt",
+      "note": "",
+      "ts": "2026-03-24T22:39:28"
+    }
+  ]
+}

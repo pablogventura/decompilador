@@ -1,0 +1,3 @@
+# Equivalente a: pip install -e ".[dev]" (recomendado)
+-r requirements.txt
+pytest>=8.0

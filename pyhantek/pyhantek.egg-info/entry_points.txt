@@ -1,0 +1,2 @@
+[console_scripts]
+hantek = hantek_usb.cli:main
