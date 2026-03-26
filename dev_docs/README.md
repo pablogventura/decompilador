@@ -1,6 +1,7 @@
 # Documentación de desarrollo (`dev_docs/`)
 
-**Índice navegable:** [`INDICE.md`](INDICE.md).
+**Índice navegable:** [`INDICE.md`](INDICE.md).  
+**Plan maestro (qué falta, qué probar, fases hasta paridad manual):** [`PENDIENTES_Y_PLAN_MANUAL_COMPLETO.md`](PENDIENTES_Y_PLAN_MANUAL_COMPLETO.md).
 
 Markdown y textos de apoyo para protocolo USB, DLL, firmware y procedimientos de laboratorio. **No** forma parte del paquete instalable `pyhantek` (solo el `README.md` dentro de `pyhantek/` va al wheel por `pyproject.toml`).
 

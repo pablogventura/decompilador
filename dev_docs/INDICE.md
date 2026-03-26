@@ -6,6 +6,7 @@ Punto de entrada para **protocolo USB**, **DLL**, **CLI Python** y **procedimien
 
 | Objetivo | Dónde empezar |
 |----------|----------------|
+| **Pendientes, pruebas en banco y plan hacia paridad con el manual** | [`PENDIENTES_Y_PLAN_MANUAL_COMPLETO.md`](PENDIENTES_Y_PLAN_MANUAL_COMPLETO.md) |
 | Instalar y usar la CLI | [`../pyhantek/README.md`](../pyhantek/README.md) |
 | Entender tramas USB y opcodes | [`pyhantek/PROTOCOLO_USB.md`](pyhantek/PROTOCOLO_USB.md) §3–6 |
 | Ver qué falta vs manual 2D72/2D42 | [`hantek/MANUAL_FIRMWARE_GAPS.md`](hantek/MANUAL_FIRMWARE_GAPS.md) |
