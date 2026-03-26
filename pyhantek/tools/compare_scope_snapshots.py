@@ -3,6 +3,9 @@
 Compara dos JSON generados por ``snapshot_scope_state.py`` (campo ``fields_u8``
 y, si difiere, el hex del payload de 21 B).
 
+El diff de campos delega en ``hantek_usb.scope_signal_metrics.diff_read_settings_summaries``
+(misma semántica que ``external_ch1_smoke`` / JSON ``settings_autoset_diff``).
+
 Ejemplo::
 
   python tools/snapshot_scope_state.py -o /tmp/a.json --note antes
@@ -15,8 +18,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from hantek_usb.scope_signal_metrics import diff_read_settings_summaries
 
 
 def _load(p: Path) -> dict:
@@ -24,6 +32,14 @@ def _load(p: Path) -> dict:
         return json.loads(p.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as e:
         raise SystemExit(f"No se pudo leer JSON {p}: {e}") from e
+
+
+def _fields_u8_as_summary(fields_u8: object | None) -> dict:
+    if fields_u8 is None:
+        return {"valid": True, "fields_u8": {}}
+    if not isinstance(fields_u8, dict):
+        return {"valid": False}
+    return {"valid": True, "fields_u8": dict(fields_u8)}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -38,23 +54,16 @@ def main(argv: list[str] | None = None) -> int:
     ns = ap.parse_args(argv)
     ja, jb = _load(ns.a), _load(ns.b)
 
-    fa = ja.get("fields_u8") or {}
-    fb = jb.get("fields_u8") or {}
-    if not isinstance(fa, dict) or not isinstance(fb, dict):
+    sa = _fields_u8_as_summary(ja.get("fields_u8"))
+    sb = _fields_u8_as_summary(jb.get("fields_u8"))
+    if not sa["valid"] or not sb["valid"]:
         print("Error: falta fields_u8 en algún JSON", file=sys.stderr)
         return 1
 
-    diffs: list[tuple[str, int, int]] = []
-    for k in sorted(set(fa) | set(fb)):
-        va, vb = fa.get(k), fb.get(k)
-        if va is None and vb is None:
-            continue
-        if va is None:
-            diffs.append((k, -1, int(vb)))
-        elif vb is None:
-            diffs.append((k, int(va), -1))
-        elif int(va) != int(vb):
-            diffs.append((k, int(va), int(vb)))
+    diff_rows = diff_read_settings_summaries(sa, sb)
+    diffs: list[tuple[str, int, int]] = [
+        (str(r["field"]), int(r["old"]), int(r["new"])) for r in diff_rows
+    ]
 
     pa = ja.get("payload_21_hex", "")
     pb = jb.get("payload_21_hex", "")

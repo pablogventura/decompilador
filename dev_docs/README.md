@@ -1,5 +1,7 @@
 # Documentación de desarrollo (`dev_docs/`)
 
+**Índice navegable:** [`INDICE.md`](INDICE.md).
+
 Markdown y textos de apoyo para protocolo USB, DLL, firmware y procedimientos de laboratorio. **No** forma parte del paquete instalable `pyhantek` (solo el `README.md` dentro de `pyhantek/` va al wheel por `pyproject.toml`).
 
 | Ruta | Contenido |

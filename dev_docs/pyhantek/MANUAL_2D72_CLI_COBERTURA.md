@@ -12,7 +12,7 @@ Referencia del manual: [`../Hantek_2D72_2D42_Manual.txt`](../Hantek_2D72_2D42_Ma
 | **25** | Solo vía bajo nivel (`bulk-send`, `cmd04440`) sin flujo de usuario claro. |
 | **0** | No expuesto / depende solo de la UI del equipo o de DLL fuera de alcance (`HTSoftDll`, etc.). |
 
-Fuentes internas: [`../../pyhantek/hantek_usb/cli.py`](../../pyhantek/hantek_usb/cli.py), [`IMPLEMENTACION_CHECKLIST.md`](IMPLEMENTACION_CHECKLIST.md), [`../hantek/MANUAL_FIRMWARE_GAPS.md`](../hantek/MANUAL_FIRMWARE_GAPS.md), [`HALLAZGOS_DMM_DDS_2026-03.md`](HALLAZGOS_DMM_DDS_2026-03.md).
+Fuentes internas: [`../../pyhantek/hantek_usb/cli.py`](../../pyhantek/hantek_usb/cli.py), [`IMPLEMENTACION_CHECKLIST.md`](IMPLEMENTACION_CHECKLIST.md), [`../hantek/MANUAL_FIRMWARE_GAPS.md`](../hantek/MANUAL_FIRMWARE_GAPS.md), [`HALLAZGOS_DMM_DDS_2026-03.md`](HALLAZGOS_DMM_DDS_2026-03.md). Herramienta de banco **CH1 externo:** [`../../pyhantek/tools/external_ch1_smoke.py`](../../pyhantek/tools/external_ch1_smoke.py).
 
 ---
 

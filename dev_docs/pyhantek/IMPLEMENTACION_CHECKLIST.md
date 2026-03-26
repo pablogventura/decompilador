@@ -23,6 +23,7 @@ Leyenda columnas:
 | Ítem | Decomp / docs | Código / CLI | Test | Hardware |
 |------|----------------|--------------|------|----------|
 | Autoset vs botón Auto | `FUN_10004440` + opcode `0x13` | `scope-autoset` | prueba manual / criterio en doc | Señal conocida (p. ej. DDS), comparar resultado |
+| Humo CH1 señal externa | `0x16` + `read-settings` | [`../../pyhantek/tools/external_ch1_smoke.py`](../../pyhantek/tools/external_ch1_smoke.py) / `external-ch1-smoke` | `pytest tests/test_scope_signal_metrics.py` | Gen. externo → CH1; `--scope-autoset` → JSON `settings_autoset_diff`; `--expect-hz` |
 | Y-T / Roll / Scan escritura | `FUN_08031a9e`, `PROTOCOLO` §3.4.1–3.4.2 | `set-yt-format`, `read-settings --parse` | — | Anotar modo LCD tras ordenes |
 | Invert canal escritura | `0x18` (experimental) | `ch-invert 0` | no operativo | **Trigger inestable**; falta RE firmware/DLL o diff estado |
 | V/div índices 10–11 | `ch_volt_map_empirico.json` | `ch-volt`, `scope_label_walk.py` | JSON / walk | CH1, repetir barrido |
@@ -106,6 +107,8 @@ Leyenda columnas:
 - 2026-03-25 — DMM **capacidad** (`dmm-type 7`): sin capacitor `55 0b 01 07 00 00 03 00 00 00 00 00 03 55` → **0 F** (`test_decode_dmm_packet_14_capacitance_zero`).
 - 2026-03-25 — **DDS arb + scope (lazo):** `build_dds_download_blob` (seno 512 pts) + `dds-download --short` OK; `dds-wave 4`, `dds-fre`/`dds-amp`/`dds-onoff --on`; `set-mode osc` + `get-source-data` → muestras ADC no planas (validación burda AWG→CH1 por USB en esta sesión).
 - 2026-03-25 — DMM **capacidad ~1 µF**: `55 0b 01 07 00 00 03 00 09 03 01 01 03 55` → **931 nF** (`nF=[7]*1000+…+[10]`, `F=nF·1e-9`); coherente con cap nominal 1 µF y tolerancia (`test_decode_dmm_packet_14_capacitance_1uf_nominal`).
+- 2026-03-25 — **`external_ch1_smoke.py`** en 2D42 (`0483:2d42`): tras fijar scope por USB (TIME_DIV inicial 16, trig Auto, `tx_wait_ack` en time/trigger), captura `0x400` B, `pp≈41`, `mean_crossings=6`, `freq_hz_est≈1500` Hz con `ram98_byte3=14` (200 µs/div); salida **OK** (exit 0). `f_est` es heurística (10 divs × time/div); usar `--expect-hz` solo si el generador está en frecuencia conocida.
+- 2026-03-25 — **`external_ch1_smoke.py --scope-autoset`** (2D42, señal en CH1): comando `python tools/external_ch1_smoke.py --scope-autoset --timeout-ms 8000 --autoset-wait-s 2` → **exit 0**; captura `0x400` B, `pp≈42`, `mean_crossings≈3`, `freq_hz_est≈750` Hz, `ram98_byte3=14`; JSON/capa diff: **`settings_autoset_diff` con 0 entradas** (ningún byte de `fields_u8` cambió entre lecturas antes/después del opcode `0x13` en ese estado). Si el timeout default (5 s) falla, subir `--timeout-ms` / `--autoset-wait-s`.
 
 ---
 
@@ -116,4 +119,5 @@ Leyenda columnas:
 - `cd pyhantek && python tools/compare_read_settings.py captures/A.txt captures/B.txt` — diff campo a campo del payload 0x15.
 - `cd pyhantek && python tools/snapshot_scope_state.py -o captures/x.json --note "antes Force"` — JSON para comparar estados.
 - `cd pyhantek && python tools/compare_scope_snapshots.py a.json b.json` — diff entre dos snapshots.
+- `cd pyhantek && python tools/external_ch1_smoke.py --json` — humo con señal en CH1 (gen. externo); ver [`INDICE.md`](../INDICE.md) § flujos.
 - Ver [`PROTOCOLO_USB.md`](PROTOCOLO_USB.md) §6.1 (advertencias DMM/DDS).

@@ -83,6 +83,22 @@ Los **`dsoHTSet*`** (p. ej. `dsoHTSetRunStop`) pasan por **`FUN_10004440`**, que
 
 Cada una acaba construyendo buffers y llamando a **`FUN_10002060`** / **`FUN_10002020`**. Para documentar **todas** las órdenes, conviene **seguir cada `dsoHTSet*` / `dsoHTGet*`** en `decompiled_hantek/HTHardDll.dll/` y anotar el **payload de 5–10 bytes** (y la longitud de lectura).
 
+### 3.2.1 Tabla rápida `FUN_10004440` (opcodes scope) y riesgos
+
+Referencia canónica en código: clase **`Opcodes04440`** en [`../../pyhantek/hantek_usb/protocol.py`](../../pyhantek/hantek_usb/protocol.py). Relación con exports del DLL: [`../hantek/EXPORTS_HTHardDll.md`](../hantek/EXPORTS_HTHardDll.md).
+
+| Opcode (hex) | Export / uso típico | Notas / riesgo |
+|----------------|---------------------|----------------|
+| `0x0C` | `dsoHTSetRunStop` | En STM32 la ruta que **aplica** RUN/STOP suele ser `scope_run_stop_stm32`, no solo este opcode sobre `FUN_08032140` (ver §5 tabla y nota RUN/STOP). |
+| `0x0D` | `dsoHTSetYTFormat` | Escritura USB **no** actualiza de forma fiable el byte horizontal que refleja `ram98_byte0` en `0x15` (ver `MANUAL_FIRMWARE_GAPS.md`). |
+| `0x0E` | `dsoHTSetTimeDiv` | Índice empírico ↔ etiqueta pantalla: `parse_resp.TIME_DIV_LABELS` / `time_div_map_empirico.json`. |
+| `0x0F`–`0x14` | Disparo (HPos, fuente, flanco, barrido, VPos) | `ram9c_byte*` en respuesta `0x15`. |
+| `0x13` | `dsoHTScopeAutoSet` | Autoset por USB; validar frente al botón *Auto* del manual. |
+| `0x17` | `dsoHTScopeZeroCali` | **No** es “Force trigger” del PDF: en 2D42 muestra calibración. |
+| `0x18` | (sin export en `HTHardDll`) | Mueve `ram9c_byte9_plus_d`; en 2D42 puede **inestabilizar el disparo** — no usar como invert operativo. |
+
+**Force trigger (manual PDF):** no aparece como export dedicado en `HTHardDll`; la hipótesis del proyecto es acción de **UI/firmware** o ruta distinta a `0x17`. Procedimiento sin sniff: [`../tools/PROCEDIMIENTO_force_trigger.txt`](../tools/PROCEDIMIENTO_force_trigger.txt).
+
 ### 3.3 Captura `0x16` y dos canales (entrelazado)
 
 En el firmware (`FUN_08032140`), la respuesta de **adquisición** entrega bytes **consecutivos** desde la RAM de muestras. En **2xx2** con **dos canales activos**, el contenido encaja con **CH1, CH2, CH1, CH2…** (un byte ADC por canal e instante). Dibujar ese buffer como una sola curva **u8** mezcla ambos canales y deforma métricas.
@@ -346,5 +362,10 @@ Resumen alineado con [`HALLAZGOS_DMM_DDS_2026-03.md`](HALLAZGOS_DMM_DDS_2026-03.
 - **`dds-offset`:** la respuesta IN puede repetirse o no reflejar el offset; el LCD puede no coincidir con lo que interpreta el PC; la comprobación definitiva de la salida es **medir DC** en la salida del generador.
 - **`dds-offset` layout (firmware `FUN_080326b8`):** subcódigo `0x03` consume **magnitud `u16` en `[5:6]`** y **signo en `[7]`** (`0` positivo/cero, `1` negativo); no tratarlo como `u32` plano.
 - **`dds-fre` / `dds-amp` (2D42):** por defecto el CLI envía **write puro** (`byte[3]=0`), que en hardware suele ser la ruta que **sí aplica** frecuencia y amplitud; la ruta con lectura IN (tipo DLL) queda detrás de **`--readback`** para depuración/comparación.
+
+### 6.2 Métricas en PC, frecuencia estimada y `external_ch1_smoke`
+
+- Módulo **[`../../pyhantek/hantek_usb/scope_signal_metrics.py`](../../pyhantek/hantek_usb/scope_signal_metrics.py)**: cruces por la media sobre muestras u8; estimación de **frecuencia en Hz** usando `ram98_byte3` + tabla empírica de time/div y una ventana horizontal asumida (**10 divisiones** por defecto, configurable). Es **heurística**: la memoria de captura no tiene por qué coincidir exactamente con el grid de 10 divs en todos los modos.
+- Script **[`../../pyhantek/tools/external_ch1_smoke.py`](../../pyhantek/tools/external_ch1_smoke.py)** (señal **externa** en CH1): pone scope en marcha, disparo **Auto**, opcionalmente `scope-autoset` (`0x13`), captura `0x16` y devuelve métricas + `freq_hz_est`. Con `--scope-autoset`, el JSON incluye **`settings_autoset_diff`**: lista `{field, old, new}` sobre `fields_u8` (misma idea que `compare_scope_snapshots --json`), vía **`diff_read_settings_summaries`** en `scope_signal_metrics`. Tras `pipx install ./pyhantek` también existe el comando **`external-ch1-smoke`**. **Códigos de salida:** `0` OK; `1` USB/parse; `2` señal plana / pocos cruces / clipping; `3` `--expect-hz` fuera de tolerancia.
 
 Con esto deberías poder plantear el CLI: **abrir dispositivo → bulk OUT comando 10 B → bulk IN bloques 64 B → interpretar** según vayas completando la tabla de opcodes desde el resto de `dsoHT*`.

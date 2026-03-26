@@ -1,7 +1,7 @@
 """
 Utilidades compartidas: DDS fijo + captura 0x16 + métricas por canal (entrelazado).
 
-Usado por ``tools/dds_osc_coherence.py``, ``tools/scope_options_probe.py`` y ``tools/scope_autoset_soft.py``.
+Usado por ``tools/dds_osc_coherence.py``, ``tools/scope_options_probe.py``, ``tools/scope_autoset_soft.py`` y ``tools/external_ch1_smoke.py``. Cruces por la media: ``hantek_usb.scope_signal_metrics``.
 """
 
 from __future__ import annotations
@@ -23,6 +23,7 @@ from hantek_usb.protocol import (
     scope_run_stop_stm32,
     work_type_packet,
 )
+from hantek_usb.scope_signal_metrics import mean_crossings_u8
 from hantek_usb.transport import HantekLink
 
 
@@ -120,18 +121,6 @@ def capture_scope_raw(
     return trim_to_expected(flatten_chunks(chunks), expected)
 
 
-def _mean_crossings(u: list[int]) -> int:
-    if len(u) < 3:
-        return 0
-    m = statistics.mean(u)
-    c = 0
-    for i in range(len(u) - 1):
-        a, b = u[i], u[i + 1]
-        if (a < m) != (b < m):
-            c += 1
-    return c
-
-
 def compute_scope_channel_metrics(
     raw: bytes,
     wave: int,
@@ -179,7 +168,7 @@ def compute_scope_channel_metrics(
     frac_mid = sum(1 for x in u if mid_lo <= x <= mid_hi) / len(u)
 
     clipped = lo <= clip_lo or hi >= clip_hi
-    crossings = _mean_crossings(u)
+    crossings = mean_crossings_u8(u)
 
     return ScopeChannelMetrics(
         wave=wave,

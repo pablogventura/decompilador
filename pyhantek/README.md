@@ -84,9 +84,15 @@ cd pyhantek
 .venv/bin/pytest tests/ -q
 ```
 
+Tras `pip install -e .`, setuptools regenera `pyhantek.egg-info/` en esta carpeta; **no se versiona** (ver `.gitignore` en la raíz del repo).
+
 ## Scripts en `tools/`
 
-Ejecutar desde **`pyhantek/`** con el venv activado: `tools/dds_osc_coherence.py`, `tools/scope_options_probe.py`, `tools/scope_label_walk.py`, etc.
+Ejecutar desde **`pyhantek/`** con el venv activado: `tools/dds_osc_coherence.py`, `tools/scope_options_probe.py`, `tools/scope_label_walk.py`, **`tools/external_ch1_smoke.py`** (generador externo → CH1; métricas + frecuencia heurística; con `--scope-autoset`, diff de `read-settings` en JSON), etc.
+
+Tras `pipx install ./pyhantek` o `pip install -e .`, el mismo script está disponible como comando **`external-ch1-smoke`**.
+
+Índice de toda la documentación: [`../dev_docs/INDICE.md`](../dev_docs/INDICE.md).
 
 Los JSON empíricos (`ch_volt_map_empirico.json`, `time_div_map_empirico.json`, …) están en la raíz de **`pyhantek/`**.
 

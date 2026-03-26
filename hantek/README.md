@@ -12,7 +12,9 @@ pipx install ./pyhantek
 
 ## Documentación de desarrollo
 
-Toda la documentación en Markdown y textos de apoyo vive en **`../dev_docs/`**:
+Mapa maestro de documentación: **[`../dev_docs/INDICE.md`](../dev_docs/INDICE.md)**.
+
+Toda la documentación en Markdown y textos de apoyo vive en **`../dev_docs/`:
 
 - **`../dev_docs/hantek/`** — `EXPORTS_HTHardDll.md`, `MANUAL_FIRMWARE_GAPS.md`
 - **`../dev_docs/pyhantek/`** — `PROTOCOLO_USB.md`, hallazgos DMM/DDS, checklist de implementación, cobertura manual vs CLI, etc.

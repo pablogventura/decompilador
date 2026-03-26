@@ -66,6 +66,10 @@ cmake-build-*/
 build/
 dist/
 
+# Setuptools / pip (regenerar con pip install -e ./pyhantek)
+**/*.egg-info/
+pyhantek/build/
+
 # --- Python ---
 .venv/
 venv/

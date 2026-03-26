@@ -102,6 +102,12 @@ Leyenda: **W** = escribe, **R64** = lee un bloque de 64 B, **(n)** = escribe n b
 | `ddsSDKSetOptions` | W(10) | — | Byte 5 = **`0x0D`**; **no** lee en esta función. |
 | `ddsSDKDownload` | W(**0x46C**) / W(**0x406**) | — | Carga masiva DDS (bloques grandes; el transporte sigue troceando a 64 B en el driver). En firmware, **0x400** B por slot arb son muestras; el resto es cabecera (ver `HALLAZGOS_DMM_DDS_2026-03.md` § arb). |
 
+### `FUN_10004440`, Force trigger y `0x17`
+
+- **`FUN_10004440`** ([`../../hantek/decompilado_HTHardDll/FUN_10004440_10004440.c`](../../hantek/decompilado_HTHardDll/FUN_10004440_10004440.c)) solo **empaqueta** el opcode y hasta 4 bytes de carga; no contiene lógica de “Force” con nombre propio.
+- **`dsoHTScopeZeroCali`** usa opcode **`0x17`** por esta vía; en hardware 2D42 se asocia a **calibración**, no al texto inglés *Force trigger* del manual (ver [`../pyhantek/PROTOCOLO_USB.md`](../pyhantek/PROTOCOLO_USB.md) §3.2.1).
+- **Force trigger** del manual: **no** consta como export `dsoHT*` en la tabla anterior; cerrar el comportamiento requiere **diff de estado** (`read-settings` / snapshots) tras pulsar la tecla en el equipo o más RE de firmware, sin depender de sniff USB en el PC (política del repo).
+
 ---
 
 ## Qué esperar en **cada bloque de 64 B** (resumen)
